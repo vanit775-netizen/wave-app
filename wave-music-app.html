@@ -2292,8 +2292,8 @@
         return fetch('/proxy?url=' + encodeURIComponent(url), options);
       }
       
-      // Fallback proxy for file:/// or remote hosting
-      return fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url), options);
+      // Fallback proxy for remote static hosting (Render/GitHub Pages)
+      return fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url), options);
     }
 
     async function searchJioSaavn(query, limit = 20) {
@@ -2479,8 +2479,8 @@
       try {
         // Fetch multiple pages to get more results
         const [page1, page2] = await Promise.all([
-          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=1&q=${encodeURIComponent(q2)}`).then(r => r.json()),
-          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=2&q=${encodeURIComponent(q2)}`).then(r => r.json()).catch(() => ({ results: [] }))
+          universalFetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=1&q=${encodeURIComponent(q2)}`).then(r => r.json()),
+          universalFetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=2&q=${encodeURIComponent(q2)}`).then(r => r.json()).catch(() => ({ results: [] }))
         ]);
         const allRaw = [...(page1?.results || []), ...(page2?.results || [])];
         if (!allRaw.length) throw new Error('No songs found');
