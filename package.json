@@ -1,0 +1,50 @@
+{
+  "name": "wave-music-app",
+  "version": "1.0.0",
+  "description": "WAVE - Your Personal Music Player",
+  "author": "WAVE Author <wave@example.com>",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64",
+    "dist": "electron-builder",
+    "build-mobile": "node build-mobile.js",
+    "open-android": "npx cap open android"
+  },
+  "build": {
+    "appId": "com.wave.musicapp",
+    "productName": "WAVE Music",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "WAVE Music"
+    }
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.0",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

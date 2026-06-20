@@ -1,0 +1,11 @@
+{
+  "appId": "com.wave.musicapp",
+  "appName": "WAVE Music",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

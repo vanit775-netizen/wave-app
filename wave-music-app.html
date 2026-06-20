@@ -1,0 +1,3588 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WAVE — Your Music</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #e8e8e8
+    }
+
+    :root {
+      --accent: #1ed760;
+      --bg0: #000;
+      --bg1: #0a0a0a;
+      --bg2: #141414;
+      --bg3: #1e1e1e;
+      --bg4: #2a2a2a;
+      --t1: #e8e8e8;
+      --t2: #a0a0a0;
+      --t3: #555;
+      --bdr: #2a2a2a;
+      --red: #e84d3d;
+      --desktop-bp: 900px;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* SIDEBAR (HIDDEN FOR MOBILE) */
+    .sidebar {
+      display: none;
+    }
+
+    .logo {
+      padding: 20px 20px 12px;
+      border-bottom: 1px solid var(--bdr);
+      flex-shrink: 0
+    }
+
+    .logo-main {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -1px
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--t3);
+      text-transform: uppercase;
+      margin-top: 2px
+    }
+
+    .nav-section {
+      padding: 12px 12px 4px;
+      flex-shrink: 0
+    }
+
+    .nav-label {
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      color: var(--t3);
+      padding: 0 8px;
+      margin-bottom: 5px;
+      text-transform: uppercase
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--t2);
+      transition: all .15s;
+      user-select: none
+    }
+
+    .nav-item:hover {
+      background: var(--bg3);
+      color: var(--t1)
+    }
+
+    .nav-item.active {
+      background: var(--bg3);
+      color: var(--accent)
+    }
+
+    .nav-item i {
+      font-size: 16px;
+      width: 18px
+    }
+
+    .badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 10px
+    }
+
+    .pl-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 12px 10px
+    }
+
+    .pl-label {
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      color: var(--t3);
+      padding: 8px 8px 4px;
+      text-transform: uppercase
+    }
+
+    .add-pl-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--t3);
+      border: 1px dashed var(--bdr);
+      transition: all .15s;
+      margin: 4px 0
+    }
+
+    .add-pl-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .pl-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--t2);
+      transition: all .15s
+    }
+
+    .pl-item:hover {
+      background: var(--bg3);
+      color: var(--t1)
+    }
+
+    .pl-item.active {
+      color: var(--accent);
+      background: var(--bg3)
+    }
+
+    .pl-dot {
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0
+    }
+
+    /* MAIN */
+    .main {
+      grid-row: 1/2;
+      background: var(--bg1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .topbar {
+      padding: 12px 20px 10px;
+      background: rgba(10, 10, 10, .97);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--bdr);
+      flex-shrink: 0;
+      z-index: 10
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .suggest-wrap {
+      position: relative;
+      flex: 1
+    }
+
+    .sbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg3);
+      border-radius: 22px;
+      padding: 9px 16px;
+      border: 1px solid var(--bdr);
+      transition: border-color .15s
+    }
+
+    .sbox:focus-within {
+      border-color: var(--accent)
+    }
+
+    .sbox i {
+      color: var(--t3);
+      font-size: 15px;
+      flex-shrink: 0
+    }
+
+    .sbox input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--t1);
+      font-size: 13px;
+      width: 100%;
+      font-family: inherit
+    }
+
+    .sbox input::placeholder {
+      color: var(--t3)
+    }
+
+    .sbtn {
+      padding: 9px 22px;
+      border-radius: 22px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: all .15s;
+      background: var(--accent);
+      color: #000;
+      white-space: nowrap
+    }
+
+    .sbtn:hover {
+      background: #17a347
+    }
+
+    .vtabs {
+      display: flex;
+      gap: 4px
+    }
+
+    .vtab {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--t2);
+      border: 1px solid var(--bdr);
+      background: none;
+      font-family: inherit;
+      transition: all .15s
+    }
+
+    .vtab.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 600
+    }
+
+    /* SUGGEST BOX */
+    .suggest-box {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 10px;
+      z-index: 100;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .6)
+    }
+
+    .suggest-box.show {
+      display: block
+    }
+
+    .suggest-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--t2);
+      transition: background .1s
+    }
+
+    .suggest-item:hover {
+      background: var(--bg3);
+      color: var(--t1)
+    }
+
+    .suggest-item img {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      object-fit: cover;
+      background: var(--bg4);
+      flex-shrink: 0
+    }
+
+    .si-title {
+      font-weight: 600;
+      color: var(--t1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 13px
+    }
+
+    .si-sub {
+      font-size: 11px;
+      color: var(--t3)
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px 20px 160px;
+      /* Space for player and bottom nav */
+    }
+
+    /* HOME PAGE */
+    .home-section {
+      margin-bottom: 28px
+    }
+
+    .home-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .home-section-title i {
+      color: var(--accent)
+    }
+
+    .songs-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 8px
+    }
+
+    .songs-scroll::-webkit-scrollbar {
+      height: 3px
+    }
+
+    .songs-scroll::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px
+    }
+
+    .song-card-h {
+      width: 130px;
+      flex-shrink: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative
+    }
+
+    .song-card-h:hover {
+      transform: translateY(-2px)
+    }
+
+    .song-card-h.playing .card-name {
+      color: var(--accent)
+    }
+
+    .card-art-h {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 4px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-art-h img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .card-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .15s;
+      border-radius: 8px
+    }
+
+    .song-card-h:hover .card-play-overlay {
+      opacity: 1
+    }
+
+    .card-play-overlay i {
+      font-size: 26px;
+      color: var(--accent)
+    }
+
+    .card-name-h {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px
+    }
+
+    .card-artist-h {
+      font-size: 11px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    /* UPLOAD */
+    .upload-zone {
+      border: 2px dashed var(--bdr);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      margin-bottom: 20px
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag {
+      border-color: var(--accent);
+      background: rgba(30, 215, 96, .04)
+    }
+
+    .upload-zone i {
+      font-size: 30px;
+      color: var(--t3);
+      display: block;
+      margin-bottom: 8px;
+      transition: color .2s
+    }
+
+    .upload-zone:hover i {
+      color: var(--accent)
+    }
+
+    .upload-zone p {
+      color: var(--t2);
+      font-size: 13px;
+      margin-bottom: 3px
+    }
+
+    .upload-zone small {
+      color: var(--t3);
+      font-size: 11px
+    }
+
+    .ubtn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 7px 20px;
+      background: var(--accent);
+      color: #000;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    /* SECTION */
+    .sec-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .sec-title small {
+      font-size: 11px;
+      color: var(--t3);
+      font-weight: 400
+    }
+
+    /* TRACK TABLE */
+    .track-hdr {
+      display: grid;
+      grid-template-columns: 46px 1fr 140px 70px 80px;
+      gap: 10px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--bdr);
+      margin-bottom: 4px;
+      font-size: 10px;
+      color: var(--t3);
+      letter-spacing: 1px;
+      text-transform: uppercase
+    }
+
+    .track-row {
+      display: grid;
+      grid-template-columns: 46px 1fr 140px 70px 80px;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      align-items: center;
+      cursor: pointer;
+      transition: background .1s
+    }
+
+    .track-row:hover {
+      background: var(--bg3)
+    }
+
+    .track-row.playing {
+      background: rgba(30, 215, 96, .07)
+    }
+
+    .track-row.playing .t-name {
+      color: var(--accent)
+    }
+
+    .t-art-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 5px;
+      object-fit: cover;
+      background: var(--bg4)
+    }
+
+    .t-art-emoji {
+      width: 36px;
+      height: 36px;
+      border-radius: 5px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px
+    }
+
+    .t-info {
+      min-width: 0
+    }
+
+    .t-name {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .t-artist {
+      font-size: 11px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px
+    }
+
+    .t-col {
+      font-size: 12px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .t-dur {
+      font-size: 12px;
+      color: var(--t2);
+      text-align: right
+    }
+
+    .t-acts {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px
+    }
+
+    .t-acts button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--t3);
+      font-size: 15px;
+      padding: 3px 4px;
+      border-radius: 4px;
+      transition: all .1s;
+      font-family: inherit;
+      opacity: 0
+    }
+
+    .track-row:hover .t-acts button {
+      opacity: 1
+    }
+
+    .t-acts button:hover {
+      color: var(--t1);
+      background: var(--bg4)
+    }
+
+    .t-acts button.liked {
+      color: var(--accent);
+      opacity: 1
+    }
+
+    /* GRID */
+    .song-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: 14px
+    }
+
+    .song-card {
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 10px;
+      padding: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative
+    }
+
+    .song-card:hover {
+      background: var(--bg3);
+      transform: translateY(-2px)
+    }
+
+    .song-card.playing {
+      border-color: var(--accent)
+    }
+
+    .card-art {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+      overflow: hidden
+    }
+
+    .card-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .card-name {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px
+    }
+
+    .card-artist {
+      font-size: 11px;
+      color: var(--t2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    /* HISTORY */
+    .hist-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .1s
+    }
+
+    .hist-row:hover {
+      background: var(--bg3)
+    }
+
+    .hist-art {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+      background: var(--bg4);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px
+    }
+
+    .hist-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .hist-meta {
+      flex: 1;
+      min-width: 0
+    }
+
+    .hist-title {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .hist-sub {
+      font-size: 11px;
+      color: var(--t2);
+      margin-top: 2px
+    }
+
+    .hist-time {
+      font-size: 11px;
+      color: var(--t3);
+      flex-shrink: 0
+    }
+
+    .src-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 700;
+      margin-left: 5px;
+      vertical-align: middle
+    }
+
+    .src-badge.saavn {
+      background: var(--red);
+      color: #fff
+    }
+
+    .src-badge.local {
+      background: var(--accent);
+      color: #000
+    }
+
+    /* SPOTIFY IMPORT */
+    .import-box {
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px
+    }
+
+    .import-box h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .import-box h3 i {
+      color: #1db954
+    }
+
+    .import-box p {
+      font-size: 12px;
+      color: var(--t2);
+      margin-bottom: 14px;
+      line-height: 1.6
+    }
+
+    .import-input {
+      display: flex;
+      gap: 10px
+    }
+
+    .import-input input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: var(--t1);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none
+    }
+
+    .import-input input:focus {
+      border-color: #1db954
+    }
+
+    .import-btn {
+      padding: 9px 18px;
+      background: #1db954;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      white-space: nowrap
+    }
+
+    /* SMART SUGGESTIONS */
+    .suggestions-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+
+    .sug-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--bg3);
+      color: var(--t2);
+      border: 1px solid var(--bdr);
+      transition: all .15s
+    }
+
+    .sug-chip:hover,
+    .sug-chip.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent)
+    }
+
+    /* EMPTY/SPINNER */
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--t3)
+    }
+
+    .empty i {
+      font-size: 44px;
+      display: block;
+      margin-bottom: 14px
+    }
+
+    .empty p {
+      font-size: 13px;
+      line-height: 1.7
+    }
+
+    .spinner {
+      text-align: center;
+      padding: 40px;
+      color: var(--t3)
+    }
+
+    .spinner i {
+      font-size: 28px;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 10px;
+      animation: spin 1s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* PLAYER BAR - MOBILE REDESIGN */
+    .player-bar {
+      position: fixed;
+      bottom: 65px;
+      left: 8px;
+      right: 8px;
+      height: 56px;
+      background: var(--bg4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .np-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .np-art {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .np-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .np-text {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .np-title {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .np-artist {
+      font-size: 11px;
+      color: var(--t2);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .np-like {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--t3);
+      font-size: 22px;
+      padding: 4px;
+      flex-shrink: 0;
+      transition: all .15s;
+    }
+
+    .np-like.liked {
+      color: var(--accent);
+    }
+
+    .p-ctrls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ctrl-btn {
+      display: none;
+      /* Hidden on mobile mini-player */
+    }
+
+    .play-btn {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      color: var(--t1);
+      font-size: 26px;
+      cursor: pointer;
+      border: none;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .prog-row {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+      right: 8px;
+      height: 2px;
+    }
+
+    .tlabel {
+      display: none;
+    }
+
+    .prog-bar {
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: var(--t1);
+      border-radius: 2px;
+    }
+
+    .prog-thumb {
+      display: none !important;
+    }
+
+    .vol-row {
+      display: none;
+      /* Mobile uses physical buttons */
+    }
+
+    .vol-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .vol-fill {
+      height: 100%;
+      background: var(--t1);
+      border-radius: 2px;
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+      border-top: 1px solid var(--bg3);
+    }
+
+    .bnav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--t2);
+      font-size: 10px;
+      gap: 4px;
+      cursor: pointer;
+      flex: 1;
+      padding: 6px 0;
+    }
+
+    .bnav-item.active {
+      color: var(--t1);
+    }
+
+    .bnav-item i {
+      font-size: 22px;
+    }
+
+    /* QUICK MOOD CHIPS */
+    .mood-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+
+    .mood-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mood-chip {
+      background: var(--bg4);
+      color: var(--t1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .mood-chip.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* RECENT GRID */
+    .recent-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .recent-card {
+      background: var(--bg4);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .recent-card img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+    }
+
+    .recent-card span {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 8px;
+    }
+
+    /* CIRCULAR ARTIST CARDS */
+    .artist-card {
+      width: 120px;
+      flex-shrink: 0;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .artist-card .card-art-h {
+      border-radius: 50%;
+    }
+
+    .artist-card .card-name {
+      margin-top: 8px;
+    }
+.a{
+    height: 100%;
+    background: var(--t2);
+    border-radius: 2px
+    }
+
+    /* MODAL */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px)
+    }
+
+    .overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 14px;
+      padding: 24px;
+      width: 340px;
+      animation: fadeUp .2s ease
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .modal h3 {
+      font-size: 16px;
+      margin-bottom: 14px
+    }
+
+    .modal input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--t1);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px
+    }
+
+    .modal input:focus {
+      border-color: var(--accent)
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end
+    }
+
+    .btn-cancel {
+      background: none;
+      border: 1px solid var(--bdr);
+      color: var(--t2);
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px
+    }
+
+    .btn-ok {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .ctx-menu {
+      display: none;
+      position: fixed;
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      padding: 6px;
+      z-index: 300;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .5)
+    }
+
+    .ctx-menu.open {
+      display: block
+    }
+
+    .ctx-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--t1)
+    }
+
+    .ctx-item:hover {
+      background: var(--bg4)
+    }
+
+    .ctx-item i {
+      font-size: 15px;
+      color: var(--t2)
+    }
+
+    .ctx-item.danger {
+      color: #e24b4a
+    }
+
+    .ctx-item.danger i {
+      color: #e24b4a
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 110px;
+      right: 20px;
+      background: var(--bg3);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 12px;
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 400;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all .2s;
+      pointer-events: none;
+      max-width: 320px
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .toast i {
+      color: var(--accent);
+      flex-shrink: 0
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px
+    }
+
+    #loading.hide {
+      display: none
+    }
+
+    .load-logo {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent)
+    }
+
+    .load-bar-wrap {
+      width: 180px;
+      height: 2px;
+      background: var(--bg4);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .load-bar {
+      height: 100%;
+      background: var(--accent);
+      animation: lp 1.1s ease infinite
+    }
+
+    @keyframes lp {
+      0% {
+        width: 0
+      }
+
+      60% {
+        width: 80%
+      }
+
+      100% {
+        width: 100%
+      }
+    }
+
+    .load-txt {
+      font-size: 11px;
+      color: var(--t3);
+      letter-spacing: 2px;
+      text-transform: uppercase
+    }
+
+    /* ── Auth Screen ── */
+    #auth-screen {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .auth-box {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 40px;
+      width: 360px;
+      text-align: center
+    }
+
+    .auth-logo {
+      color: #1db954;
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 4px
+    }
+
+    .auth-tagline {
+      color: #555;
+      font-size: 12px;
+      margin-bottom: 30px
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+      gap: 4px
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: none;
+      color: #666;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 600
+    }
+
+    .auth-tab.active {
+      background: #1db954;
+      color: #000
+    }
+
+    .auth-input {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 10px;
+      display: block
+    }
+
+    .auth-input:focus {
+      border-color: #1db954
+    }
+
+    .auth-btn {
+      width: 100%;
+      background: #1db954;
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 4px;
+      font-family: inherit
+    }
+
+    .auth-err {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 18px
+    }
+
+    #blocked-screen {
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center
+    }
+
+    .blocked-box {
+      background: #141414;
+      border: 2px solid #e74c3c;
+      border-radius: 20px;
+      padding: 40px;
+      width: 400px;
+      text-align: center
+    }
+
+    .blocked-icon {
+      font-size: 48px;
+      margin-bottom: 16px
+    }
+
+    .blocked-title {
+      color: #e74c3c;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 12px
+    }
+
+    .blocked-msg {
+      color: #aaa;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 20px
+    }
+
+    .blocked-email {
+      color: #1db954;
+      font-weight: 700
+    }
+
+    /* Settings page */
+    .settings-box {
+      background: var(--bg2);
+      border: 1px solid var(--bdr);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--bdr)
+    }
+
+    .settings-row:last-child {
+      border-bottom: none
+    }
+
+    .settings-label {
+      font-size: 13px;
+      color: var(--t1);
+      font-weight: 600
+    }
+
+    .settings-sub {
+      font-size: 11px;
+      color: var(--t3);
+      margin-top: 2px
+    }
+
+    .settings-btn {
+      background: var(--bg3);
+      border: 1px solid var(--bdr);
+      color: var(--t1);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .settings-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .settings-btn.danger:hover {
+      border-color: #e74c3c;
+      color: #e74c3c
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    /* ═══════════════ DESKTOP LAYOUT (≥ 900px) ═══════════════ */
+    @media (min-width: 900px) {
+      .app {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: 1fr;
+        flex-direction: unset;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        grid-row: 1 / -1;
+        width: 240px;
+        height: 100vh;
+        border-right: 1px solid var(--bdr);
+        background: var(--bg2);
+        overflow-y: auto;
+        position: sticky;
+        top: 0;
+      }
+
+      .main {
+        grid-column: 2;
+        grid-row: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .content {
+        padding: 24px 28px 100px;
+      }
+
+      .player-bar {
+        position: fixed;
+        bottom: 0;
+        left: 240px;
+        right: 0;
+        height: 72px;
+        border-radius: 0;
+        padding: 0 24px;
+        gap: 16px;
+        background: var(--bg2);
+        border-top: 1px solid var(--bdr);
+        box-shadow: none;
+      }
+
+      .bottom-nav {
+        display: none !important;
+      }
+
+      .ctrl-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--t2);
+        font-size: 18px;
+        padding: 4px;
+        transition: color .15s;
+      }
+
+      .ctrl-btn:hover {
+        color: var(--t1);
+      }
+
+      .ctrl-btn.active {
+        color: var(--accent);
+      }
+
+      .p-ctrls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .prog-row {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        height: auto;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .prog-bar {
+        height: 4px;
+        cursor: pointer;
+        flex: 1;
+      }
+
+      .prog-bar:hover {
+        height: 6px;
+      }
+
+      .prog-thumb {
+        display: block !important;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--t1);
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity .15s;
+      }
+
+      .prog-bar:hover .prog-thumb {
+        opacity: 1;
+      }
+
+      .tlabel {
+        display: inline;
+        font-size: 11px;
+        color: var(--t3);
+        min-width: 35px;
+        text-align: center;
+      }
+
+      .vol-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 140px;
+        flex-shrink: 0;
+        cursor: pointer;
+        color: var(--t2);
+        font-size: 16px;
+      }
+
+      .np-info {
+        flex: 0 1 280px;
+        min-width: 180px;
+      }
+
+      .recent-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+
+      .toast {
+        bottom: 90px;
+      }
+
+      .track-hdr,
+      .track-row {
+        grid-template-columns: 46px 1fr 140px 70px 80px;
+      }
+    }
+
+    /* ═══════════════ WIDE DESKTOP (≥ 1200px) ═══════════════ */
+    @media (min-width: 1200px) {
+      .recent-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      }
+
+      .song-card-h {
+        width: 150px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="auth-screen">
+    <div class="auth-box">
+      <div class="auth-logo">♪ WAVE</div>
+      <div class="auth-tagline">YOUR MUSIC. YOUR VIBE.</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      <div id="form-login">
+        <input class="auth-input" id="login-email" type="email" placeholder="Email address"
+          onkeydown="if(event.key==='Enter')doLogin()">
+        <input class="auth-input" id="login-pass" type="password" placeholder="Password"
+          onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="auth-btn" onclick="doLogin()" id="login-btn">Login</button>
+        <div class="auth-err" id="login-err"></div>
+      </div>
+      <div id="form-signup" style="display:none">
+        <input class="auth-input" id="signup-email" type="email" placeholder="Email address"
+          onkeydown="if(event.key==='Enter')doSignup()">
+        <input class="auth-input" id="signup-user" type="text" placeholder="Username"
+          onkeydown="if(event.key==='Enter')doSignup()">
+        <input class="auth-input" id="signup-pass" type="password" placeholder="Password (min 6 chars)"
+          onkeydown="if(event.key==='Enter')doSignup()">
+        <button class="auth-btn" onclick="doSignup()" id="signup-btn">Create Account</button>
+        <div class="auth-err" id="signup-err"></div>
+      </div>
+    </div>
+  </div>
+  <div id="blocked-screen" style="display:none;align-items:center;justify-content:center">
+    <div class="blocked-box">
+      <div class="blocked-icon">🚫</div>
+      <div class="blocked-title">You Are Blocked</div>
+      <div class="blocked-msg">
+        You have been blocked from using <strong>WAVE</strong> by the developer.<br><br>
+        If you believe this is a mistake, contact us at:<br>
+        <span class="blocked-email">wavemusicappsupport@gmail.com</span>
+      </div>
+      <div style="color:#555;font-size:11px;margin-top:8px">Reason: <span id="block-reason-text">Policy violation</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading">
+    <div class="load-logo">♪ WAVE</div>
+    <div class="load-bar-wrap">
+      <div class="load-bar"></div>
+    </div>
+    <div class="load-txt" id="load-txt">Loading...</div>
+  </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-main">♪ WAVE</div>
+        <div class="logo-sub">Your music. Your vibe.</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Discover</div>
+        <div class="nav-item active" id="nav-home" onclick="goPage('home')"><i class="ti ti-home"></i> Home</div>
+        <div class="nav-item" id="nav-search" onclick="goPage('search')"><i class="ti ti-search"></i> Search Songs</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Library</div>
+        <div class="nav-item" id="nav-lib" onclick="goPage('library')"><i class="ti ti-music"></i> My Songs</div>
+        <div class="nav-item" id="nav-liked" onclick="goPage('liked')"><i class="ti ti-heart"></i> Liked Songs <span
+            class="badge" id="liked-badge" style="display:none">0</span></div>
+        <div class="nav-item" id="nav-hist" onclick="goPage('history')"><i class="ti ti-history"></i> History</div>
+        <div class="nav-item" id="nav-import" onclick="goPage('import')"><i class="ti ti-brand-spotify"></i> Import
+          Playlist</div>
+        <div class="nav-item" id="nav-merge" onclick="goPage('merge')"><i class="ti ti-git-merge"></i> Merge Playlists
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Account</div>
+        <div class="nav-item" id="nav-settings" onclick="goPage('settings')"><i class="ti ti-settings"></i> Settings
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Playlists</div>
+        <div class="add-pl-btn" onclick="openCreatePl()"><i class="ti ti-plus"></i> New Playlist</div>
+      </div>
+      <div class="pl-section" id="pl-list"></div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div id="local-hdr" style="display:flex;gap:10px;align-items:center;width:100%">
+          <div class="suggest-wrap" style="flex:1">
+            <div class="sbox">
+              <i class="ti ti-search"></i>
+              <input id="local-search" type="text" placeholder="Search your songs..." oninput="localSearch(this.value)">
+            </div>
+          </div>
+          <div class="vtabs">
+            <button class="vtab active" id="tab-list" onclick="setTab('list')">List</button>
+            <button class="vtab" id="tab-grid" onclick="setTab('grid')">Grid</button>
+          </div>
+        </div>
+        <div id="search-hdr" style="display:none;width:100%">
+          <div class="search-row">
+            <div class="suggest-wrap">
+              <div class="sbox">
+                <i class="ti ti-search"></i>
+                <input id="saavn-search" type="text" placeholder="Search any song, artist, album..."
+                  onkeydown="if(event.key==='Enter'){hideSug();doSearch()}" oninput="fetchSug(this.value)"
+                  autocomplete="off">
+              </div>
+              <div class="suggest-box" id="sug-box"></div>
+            </div>
+            <button class="sbtn" onclick="doSearch()"><i class="ti ti-search"></i> Search</button>
+          </div>
+        </div>
+      </div>
+      <div class="content" id="content"></div>
+    </main>
+    <div class="player-bar">
+      <div class="np-info">
+        <div class="np-art" id="np-art">🎵</div>
+        <div class="np-text">
+          <div class="np-title" id="np-title">Nothing playing</div>
+          <div class="np-artist" id="np-artist">—</div>
+        </div>
+        <button class="np-like" id="np-like" onclick="likeCurrentSong()"><i class="ti ti-heart"></i></button>
+      </div>
+      <div class="p-ctrls">
+        <div class="ctrl-row">
+          <button class="ctrl-btn" id="btn-shuffle" onclick="toggleShuffle()" title="Smart Shuffle"><i
+              class="ti ti-arrows-shuffle"></i></button>
+          <button class="ctrl-btn" onclick="prevTrack()"><i class="ti ti-player-skip-back"></i></button>
+          <button class="play-btn" onclick="togglePlay()"><i class="ti ti-player-play" id="play-ico"></i></button>
+          <button class="ctrl-btn" onclick="nextTrack()"><i class="ti ti-player-skip-forward"></i></button>
+          <button class="ctrl-btn" id="btn-repeat" onclick="toggleRepeat()"><i class="ti ti-repeat"></i></button>
+        </div>
+        <div class="prog-row">
+          <span class="tlabel" id="t-cur">0:00</span>
+          <div class="prog-bar" id="prog-bar" onclick="seekTo(event)">
+            <div class="prog-fill" id="prog-fill" style="width:0%"></div>
+            <div class="prog-thumb" id="prog-thumb" style="left:0%"></div>
+          </div>
+          <span class="tlabel" id="t-dur">0:00</span>
+        </div>
+      </div>
+      <div class="vol-row">
+        <i class="ti ti-volume" id="vol-ico" onclick="toggleMute()"></i>
+        <div class="vol-bar" onclick="setVol(event)">
+          <div class="vol-fill" id="vol-fill" style="width:80%"></div>
+        </div>
+      </div>
+    </div>
+    <nav class="bottom-nav">
+      <div class="bnav-item active" id="bnav-home" onclick="goPage('home')">
+        <i class="ti ti-home"></i><span>Home</span>
+      </div>
+      <div class="bnav-item" id="bnav-search" onclick="goPage('search')">
+        <i class="ti ti-search"></i><span>Search</span>
+      </div>
+      <div class="bnav-item" id="bnav-lib" onclick="goPage('library')">
+        <i class="ti ti-music"></i><span>Library</span>
+      </div>
+      <div class="bnav-item" id="bnav-settings" onclick="goPage('settings')">
+        <i class="ti ti-user"></i><span>Profile</span>
+      </div>
+    </nav>
+  </div>
+  <!-- MODALS -->
+  <div class="overlay" id="modal-pl">
+    <div class="modal">
+      <h3>New Playlist</h3>
+      <input type="text" id="pl-name-in" placeholder="Playlist name..." maxlength="40">
+      <div class="modal-btns"><button class="btn-cancel" onclick="closeModals()">Cancel</button><button class="btn-ok"
+          onclick="doCreatePl()">Create</button></div>
+    </div>
+  </div>
+  <div class="overlay" id="modal-addto">
+    <div class="modal">
+      <h3>Add to Playlist</h3>
+      <div id="addto-items" style="max-height:220px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="modal-btns"><button class="btn-ok" onclick="closeModals()">Done</button></div>
+    </div>
+  </div>
+  <div class="ctx-menu" id="ctx-menu">
+    <div class="ctx-item" id="ctx-like-item" onclick="ctxLike()"><i class="ti ti-heart"></i> Like</div>
+    <div class="ctx-item" onclick="ctxAddTo()"><i class="ti ti-playlist-add"></i> Add to playlist</div>
+    <div class="ctx-item danger" onclick="ctxDelete()"><i class="ti ti-trash"></i> Remove</div>
+  </div>
+  <!-- PLAYLIST CONTEXT MENU -->
+  <div class="ctx-menu" id="pl-ctx-menu">
+    <div class="ctx-item" onclick="renamePl()"><i class="ti ti-pencil"></i> Rename</div>
+    <div class="ctx-item danger" onclick="deletePl()"><i class="ti ti-trash"></i> Delete Playlist</div>
+  </div>
+  <div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-msg">Saved</span></div>
+  <audio id="audio"></audio>
+  <script>
+    // ═══════════════ INDEXEDDB ═══════════════
+    let waveUser = null;
+    try {
+      const cachedUser = localStorage.getItem('wave_user');
+      if (cachedUser) waveUser = JSON.parse(cachedUser);
+    } catch (e) { }
+
+    let db = null;
+    function openDB() { return new Promise((res, rej) => { const dbName = waveUser && waveUser.email ? 'WaveApp_' + waveUser.email : 'WaveApp5'; const r = indexedDB.open(dbName, 1); r.onupgradeneeded = e => { const d = e.target.result; if (!d.objectStoreNames.contains('songs')) d.createObjectStore('songs', { keyPath: 'id' }); if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta', { keyPath: 'key' }) }; r.onsuccess = e => { db = e.target.result; res() }; r.onerror = () => rej(r.error) }) }
+    const DS = (s, m) => db.transaction(s, m).objectStore(s);
+    const dbPut = (s, v) => new Promise((res, rej) => { const r = DS(s, 'readwrite').put(v); r.onsuccess = res; r.onerror = () => rej(r.error) });
+    const dbGet = (s, k) => new Promise((res, rej) => { const r = DS(s, 'readonly').get(k); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error) });
+    const dbAll = (s) => new Promise((res, rej) => { const r = DS(s, 'readonly').getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error) });
+    const dbDel = (s, k) => new Promise((res, rej) => { const r = DS(s, 'readwrite').delete(k); r.onsuccess = res; r.onerror = () => rej(r.error) });
+
+    async function saveMeta() {
+      await dbPut('meta', {
+        key: 'state',
+        library: library.map(t => ({ id: t.id, title: t.title, artist: t.artist, emoji: t.emoji, duration: t.duration, img: t.img || '' })),
+        playlists, nextPId, history, likedStreams,
+        settings: { shuffle, repeat, tabView, vol }
+      });
+    }
+    let saveT = null;
+    function scheduleSave(msg) { clearTimeout(saveT); saveT = setTimeout(async () => { await saveMeta(); if (msg) toast(msg) }, 600) }
+    async function loadDB() {
+      const rows = await dbAll('songs'); const bmap = {}; rows.forEach(r => { bmap[r.id] = URL.createObjectURL(r.blob) });
+      const meta = await dbGet('meta', 'state');
+      if (meta) {
+        library = deduplicateSongs((meta.library || []).filter(t => bmap[t.id]).map(t => ({ ...t, url: bmap[t.id] })));
+        playlists = meta.playlists || []; nextPId = meta.nextPId || 1;
+        history = deduplicateSongs(meta.history || []); likedStreams = deduplicateSongs(meta.likedStreams || []);
+        if (meta.settings) { shuffle = meta.settings.shuffle ?? false; repeat = meta.settings.repeat ?? false; tabView = meta.settings.tabView ?? 'list'; vol = meta.settings.vol ?? 0.8 }
+      }
+      if (!playlists.find(p => p.id === 'liked')) playlists.unshift({ id: 'liked', name: 'Liked Songs', icon: '❤️', tracks: [] });
+    }
+
+    // ═══════════════ STATE ═══════════════
+    const EMOJIS = ['🎵', '🎶', '🎸', '🎹', '🥁', '🎺', '🎷', '🪗', '🎻', '🪘'];
+    let library = [], playlists = [], nextPId = 1;
+    let page = 'home', activePl = null, tabView = 'list', q = '';
+    let curIdx = -1, playing = false, shuffle = false, repeat = false, muted = false, vol = 0.8;
+    let ctxId = null, history = [], shuffleQ = [], likedStreams = [];
+    let saavnResults = [], currentStream = null, currentStreamQueue = [], currentStreamIdx = -1; // stream playback state
+    const audio = document.getElementById('audio');
+    audio.volume = vol;
+    const uid = () => 'tr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    const ft = s => { if (!s || isNaN(s) || s < 0) return '0:00'; return Math.floor(s / 60) + ':' + (Math.floor(s % 60) < 10 ? '0' : '') + Math.floor(s % 60) };
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const fixUrl = u => (u || '').replace(/\\\//g, '/');
+    const decodeHtml = s => s.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&#039;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&apos;/g, "'");
+
+    // ═══════════════ DEDUPLICATION UTILITY ═══════════════
+    function deduplicateSongs(songs) {
+      const seen = new Set();
+      return songs.filter(s => {
+        const title = (s.title || '').toLowerCase().replace(/\s*\(.*?\)\s*/g, '').replace(/\s*\[.*?\]\s*/g, '').replace(/[^a-z0-9\s]/g, '').trim();
+        const artist = ((s.artist || '').split(',')[0] || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+        const key = title + '|' + artist;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // ═══════════════ SONG CLASSIFICATION SYSTEM ═══════════════
+    const HINDI_ARTISTS = ['arijit singh', 'shreya ghoshal', 'kishore kumar', 'lata mangeshkar', 'mohammed rafi', 'kumar sanu', 'udit narayan', 'sonu nigam', 'neha kakkar', 'atif aslam', 'jubin nautiyal', 'darshan raval', 'b praak', 'vishal mishra', 'sachin-jigar', 'pritam', 'a.r. rahman', 'ar rahman', 'amit trivedi', 'shankar mahadevan', 'armaan malik', 'badshah', 'yo yo honey singh', 'honey singh', 'raftaar', 'divine', 'mc stan', 'king', 'anuv jain', 'talwiinder', 'ap dhillon', 'diljit dosanjh', 'guru randhawa', 'harrdy sandhu', 'jasleen royal', 'mohit chauhan', 'kk', 'mika singh', 'sunidhi chauhan', 'alka yagnik', 'asha bhosle', 'rahat fateh ali khan', 'stebin ben', 'sachet tandon', 'tulsi kumar', 'palak muchhal', 'monali thakur', 'ash king', 'ankit tiwari', 'shaan', 'javed ali', 'papon', 'sukhwinder singh', 'abhijeet', 'hemant kumar', 'mukesh', 'talat mahmood', 'manna dey', 'geeta dutt', 'shamshad begum', 'nusrat fateh ali khan', 'ghulam ali'];
+    const ENGLISH_ARTISTS = ['taylor swift', 'ed sheeran', 'drake', 'the weeknd', 'billie eilish', 'dua lipa', 'ariana grande', 'post malone', 'justin bieber', 'harry styles', 'olivia rodrigo', 'bad bunny', 'beyonce', 'adele', 'rihanna', 'bruno mars', 'eminem', 'kanye west', 'lady gaga', 'katy perry', 'maroon 5', 'imagine dragons', 'coldplay', 'bts', 'blackpink', 'travis scott', 'kendrick lamar', 'sza', 'doja cat', 'lil nas x', 'charlie puth', 'shawn mendes', 'sam smith', 'lizzo', 'miley cyrus', 'selena gomez', 'halsey', 'lana del rey', 'the chainsmokers', 'marshmello', 'alan walker', 'avicii', 'martin garrix', 'david guetta', 'calvin harris', 'sia', 'ellie goulding', 'cardi b', 'megan thee stallion', '21 savage', 'j cole', 'tyler the creator', 'frank ocean', 'arctic monkeys', 'radiohead', 'nirvana', 'queen', 'michael jackson', 'elvis presley', 'the beatles', 'pink floyd', 'led zeppelin', 'bob marley', 'whitney houston', 'mariah carey', 'celine dion', 'elton john', 'freddie mercury', 'sabrina carpenter', 'gracie abrams', 'tyla', 'chappell roan', 'benson boone', 'teddy swims', 'hozier', 'tate mcrae', 'jack harlow'];
+    const PUNJABI_ARTISTS = ['ap dhillon', 'diljit dosanjh', 'guru randhawa', 'harrdy sandhu', 'sidhu moose wala', 'karan aujla', 'ammy virk', 'jassie gill', 'parmish verma', 'garry sandhu', 'jazzy b', 'gurdas maan', 'babbu maan', 'b praak', 'jaani', 'mankirt aulakh', 'jass manak', 'r nait', 'amrit maan', 'sharry mann', 'ranjit bawa', 'ninja', 'singga', 'bohemia'];
+
+    const CLASSIC_ERA_ARTISTS = ['kishore kumar', 'lata mangeshkar', 'mohammed rafi', 'asha bhosle', 'mukesh', 'hemant kumar', 'talat mahmood', 'manna dey', 'geeta dutt', 'shamshad begum', 'nusrat fateh ali khan', 'ghulam ali', 'elvis presley', 'the beatles', 'pink floyd', 'led zeppelin', 'bob marley', 'queen', 'freddie mercury', 'michael jackson'];
+    const OLD_ERA_ARTISTS = ['kumar sanu', 'udit narayan', 'alka yagnik', 'sonu nigam', 'kk', 'shaan', 'abhijeet', 'lucky ali', 'shankar mahadevan', 'a.r. rahman', 'ar rahman', 'jagjit singh', 'whitney houston', 'mariah carey', 'celine dion', 'elton john', 'nirvana', 'radiohead', 'backstreet boys', 'spice girls'];
+    const MODERN_ERA_ARTISTS = ['arijit singh', 'shreya ghoshal', 'neha kakkar', 'atif aslam', 'mohit chauhan', 'pritam', 'amit trivedi', 'badshah', 'yo yo honey singh', 'honey singh', 'mika singh', 'sunidhi chauhan', 'taylor swift', 'ed sheeran', 'adele', 'rihanna', 'bruno mars', 'eminem', 'kanye west', 'lady gaga', 'katy perry', 'coldplay', 'imagine dragons', 'maroon 5', 'justin bieber', 'ariana grande', 'dua lipa', 'sam smith', 'shawn mendes', 'charlie puth', 'sia', 'ellie goulding', 'the chainsmokers', 'avicii', 'david guetta', 'calvin harris', 'alan walker', 'marshmello', 'drake', 'post malone'];
+    const LATEST_ERA_ARTISTS = ['jubin nautiyal', 'darshan raval', 'b praak', 'vishal mishra', 'sachin-jigar', 'king', 'anuv jain', 'talwiinder', 'ap dhillon', 'mc stan', 'divine', 'raftaar', 'stebin ben', 'sachet tandon', 'jasleen royal', 'the weeknd', 'billie eilish', 'olivia rodrigo', 'doja cat', 'sza', 'lil nas x', 'harry styles', 'bad bunny', 'bts', 'blackpink', 'travis scott', 'kendrick lamar', 'jack harlow', 'sabrina carpenter', 'gracie abrams', 'tyla', 'chappell roan', 'benson boone', 'teddy swims', 'hozier', 'tate mcrae', 'diljit dosanjh', 'karan aujla', 'sidhu moose wala', 'jass manak'];
+
+    function detectLanguage(title, artist) {
+      const t = (title || '').toLowerCase();
+      const a = (artist || '').toLowerCase();
+      const mainArtist = a.split(',')[0].trim();
+      // Check Devanagari / Hindi script in title
+      if (/[\u0900-\u097F]/.test(title)) return 'hindi';
+      // Check Gurmukhi script
+      if (/[\u0A00-\u0A7F]/.test(title)) return 'punjabi';
+      // Check known artist lists
+      if (PUNJABI_ARTISTS.some(pa => mainArtist.includes(pa) || pa.includes(mainArtist))) return 'punjabi';
+      if (HINDI_ARTISTS.some(ha => mainArtist.includes(ha) || ha.includes(mainArtist))) return 'hindi';
+      if (ENGLISH_ARTISTS.some(ea => mainArtist.includes(ea) || ea.includes(mainArtist))) return 'english';
+      // Keyword hints
+      const hindiKw = ['ishq', 'dil', 'pyar', 'tum', 'meri', 'tera', 'sanam', 'channa', 'sajni', 'rang', 'naina', 'baarish', 'raabta', 'humsafar', 'meherbaan', 'sun', 'raha', 'hai', 'tu', 'jaana', 'pehla', 'phir', 'kabhi', 'zara', 'judaa', 'dard', 'jiya', 'jeena', 'duniya', 'sapna', 'kahani', 'deewana', 'pagal', 'piya', 'sajan'];
+      const punjabiKw = ['vibe', 'jatt', 'gabru', 'laung', 'gawacha', 'kudi', 'nakhra', 'bhangra', 'patiala', 'mundiya', 'tere', 'naal', 'yaar', 'billo'];
+      if (hindiKw.some(kw => t.includes(kw))) return 'hindi';
+      if (punjabiKw.some(kw => t.includes(kw))) return 'punjabi';
+      // Default: if artist has some Hindi keywords in their other songs context
+      if (a.includes('bollywood') || a.includes('hindi')) return 'hindi';
+      return 'english'; // default
+    }
+
+    function detectEra(artist, title) {
+      const a = (artist || '').toLowerCase();
+      const mainArtist = a.split(',')[0].trim();
+      if (LATEST_ERA_ARTISTS.some(la => mainArtist.includes(la) || la.includes(mainArtist))) return 'latest';
+      if (MODERN_ERA_ARTISTS.some(ma => mainArtist.includes(ma) || ma.includes(mainArtist))) return 'modern';
+      if (OLD_ERA_ARTISTS.some(oa => mainArtist.includes(oa) || oa.includes(mainArtist))) return 'old';
+      if (CLASSIC_ERA_ARTISTS.some(ca => mainArtist.includes(ca) || ca.includes(mainArtist))) return 'classic';
+      // Keyword hints
+      const t = (title || '').toLowerCase();
+      if (t.includes('remix') || t.includes('2024') || t.includes('2025') || t.includes('2026')) return 'latest';
+      if (t.includes('old') || t.includes('classic') || t.includes('retro')) return 'classic';
+      return 'modern'; // default
+    }
+
+    function detectGenre(title, artist) {
+      const t = (title || '').toLowerCase();
+      const a = (artist || '').toLowerCase();
+      if (t.includes('lofi') || t.includes('lo-fi') || t.includes('slowed') || t.includes('reverb')) return 'lofi';
+      if (t.includes('phonk') || t.includes('drift')) return 'phonk';
+      if (t.includes('remix') || t.includes('dj') || t.includes('club')) return 'remix';
+      if (t.includes('sad') || t.includes('heartbreak') || t.includes('broken') || t.includes('dard') || t.includes('judaa')) return 'sad';
+      if (t.includes('romantic') || t.includes('love') || t.includes('ishq') || t.includes('pyar')) return 'romantic';
+      if (t.includes('party') || t.includes('dance') || t.includes('beat')) return 'party';
+      if (t.includes('rap') || a.includes('rap')) return 'hiphop';
+      if (['eminem', 'drake', 'kendrick lamar', 'j cole', 'kanye west', 'travis scott', '21 savage', 'cardi b', 'megan thee stallion', 'lil nas x', 'divine', 'raftaar', 'mc stan', 'badshah', 'honey singh', 'yo yo honey singh', 'bohemia', 'king'].some(ra => a.includes(ra))) return 'hiphop';
+      if (['coldplay', 'imagine dragons', 'arctic monkeys', 'radiohead', 'nirvana', 'pink floyd', 'led zeppelin', 'queen'].some(ra => a.includes(ra))) return 'rock';
+      if (['marshmello', 'alan walker', 'avicii', 'martin garrix', 'david guetta', 'calvin harris', 'the chainsmokers', 'kygo'].some(ra => a.includes(ra))) return 'edm';
+      // Default by language
+      const lang = detectLanguage(title, artist);
+      if (lang === 'hindi') return 'bollywood';
+      if (lang === 'punjabi') return 'punjabi';
+      return 'pop';
+    }
+
+    function classifySong(song) {
+      if (!song) return { language: 'unknown', era: 'modern', genre: 'pop', mainArtist: '' };
+      // Cache classification on the song object
+      if (song._classified) return song._classified;
+      const result = {
+        language: detectLanguage(song.title, song.artist),
+        era: detectEra(song.artist, song.title),
+        genre: detectGenre(song.title, song.artist),
+        mainArtist: ((song.artist || '').split(',')[0] || '').trim().toLowerCase()
+      };
+      song._classified = result;
+      return result;
+    }
+
+    // ═══════════════ SESSION CONTEXT TRACKING ═══════════════
+    let sessionContext = {
+      languages: {},
+      eras: {},
+      genres: {},
+      artists: {},
+      recentIds: [],
+      lastPlayed: null
+    };
+
+    function updateSessionContext(song) {
+      if (!song) return;
+      const c = classifySong(song);
+      sessionContext.languages[c.language] = (sessionContext.languages[c.language] || 0) + 1;
+      sessionContext.eras[c.era] = (sessionContext.eras[c.era] || 0) + 1;
+      sessionContext.genres[c.genre] = (sessionContext.genres[c.genre] || 0) + 1;
+      if (c.mainArtist) sessionContext.artists[c.mainArtist] = (sessionContext.artists[c.mainArtist] || 0) + 1;
+      const songId = song.id || (song.title + '|' + song.artist);
+      sessionContext.recentIds.push(songId);
+      if (sessionContext.recentIds.length > 30) sessionContext.recentIds = sessionContext.recentIds.slice(-30);
+      sessionContext.lastPlayed = song;
+    }
+
+    function getSessionDominant(map) {
+      let best = null, bestCount = 0;
+      for (const [key, count] of Object.entries(map)) {
+        if (count > bestCount) { best = key; bestCount = count; }
+      }
+      return best;
+    }
+
+    // ═══════════════ SMART SHUFFLE ALGORITHM ═══════════════
+    function scoreSong(candidate, currentSong) {
+      const cc = classifySong(candidate);
+      const cur = classifySong(currentSong);
+      let score = 0;
+
+      // Language match (weight: 40)
+      const domLang = getSessionDominant(sessionContext.languages) || cur.language;
+      if (cc.language === cur.language) score += 40;
+      else if (cc.language === domLang) score += 30;
+
+      // Era match (weight: 25)
+      const eraOrder = ['classic', 'old', 'modern', 'latest'];
+      const curEraIdx = eraOrder.indexOf(cur.era);
+      const candEraIdx = eraOrder.indexOf(cc.era);
+      const eraDist = Math.abs(curEraIdx - candEraIdx);
+      if (eraDist === 0) score += 25;
+      else if (eraDist === 1) score += 15;
+      else if (eraDist === 2) score += 5;
+      // eraDist 3 = 0 points
+
+      // Genre match (weight: 20)
+      if (cc.genre === cur.genre) score += 20;
+      else {
+        // Partial matches for related genres
+        const related = {
+          'bollywood': ['romantic', 'sad', 'party'],
+          'romantic': ['bollywood', 'sad', 'pop'],
+          'sad': ['bollywood', 'romantic', 'lofi'],
+          'pop': ['romantic', 'edm', 'party'],
+          'hiphop': ['party', 'phonk', 'remix'],
+          'lofi': ['sad', 'romantic', 'phonk'],
+          'phonk': ['lofi', 'hiphop', 'edm'],
+          'edm': ['party', 'pop', 'remix'],
+          'party': ['edm', 'hiphop', 'remix', 'pop', 'bollywood'],
+          'remix': ['edm', 'party', 'hiphop'],
+          'rock': ['pop', 'edm'],
+          'punjabi': ['party', 'hiphop', 'bollywood']
+        };
+        if (related[cur.genre]?.includes(cc.genre)) score += 10;
+      }
+
+      // Artist similarity (weight: 10)
+      if (cc.mainArtist && cc.mainArtist === cur.mainArtist) score += 10;
+      else if (cc.mainArtist && sessionContext.artists[cc.mainArtist]) score += 5;
+
+      // Diversity factor (weight: 5) — adds controlled randomness
+      score += Math.random() * 5;
+
+      // Recently played penalty (weight: -30)
+      const candId = candidate.id || (candidate.title + '|' + candidate.artist);
+      if (sessionContext.recentIds.includes(candId)) score -= 30;
+
+      // Don't replay the current song
+      const curId = currentSong.id || (currentSong.title + '|' + currentSong.artist);
+      if (candId === curId) score -= 100;
+
+      return score;
+    }
+
+    function getSmartShuffleNext(queue, currentSong) {
+      if (!queue || queue.length === 0) return -1;
+      if (queue.length === 1) return 0;
+
+      // Score all candidates
+      const scored = queue.map((song, idx) => ({
+        idx,
+        score: scoreSong(song, currentSong)
+      }));
+
+      // Sort by score descending
+      scored.sort((a, b) => b.score - a.score);
+
+      // 10% chance to pick from outside top cluster (diversity exploration)
+      if (Math.random() < 0.1 && scored.length > 5) {
+        const diversePool = scored.slice(Math.floor(scored.length * 0.4), Math.floor(scored.length * 0.7));
+        if (diversePool.length > 0) {
+          return diversePool[Math.floor(Math.random() * diversePool.length)].idx;
+        }
+      }
+
+      // Pick from top 3-5 candidates with weighted random
+      const topN = Math.min(scored.length, Math.max(3, Math.floor(scored.length * 0.15)));
+      const topCandidates = scored.slice(0, topN);
+      const totalScore = topCandidates.reduce((sum, c) => sum + Math.max(c.score, 1), 0);
+      let rand = Math.random() * totalScore;
+      for (const c of topCandidates) {
+        rand -= Math.max(c.score, 1);
+        if (rand <= 0) return c.idx;
+      }
+      return topCandidates[0].idx;
+    }
+
+    // ═══════════════ JIOSAAVN API ═══════════════
+    async function searchJioSaavn(query, limit = 20) {
+      const url = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=${limit}&p=1&q=${encodeURIComponent(query)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Search failed');
+      const data = JSON.parse(await res.text());
+      const results = (data?.results || []).map(s => {
+        const mi = s.more_info || {};
+        return {
+          id: s.id || '',
+          title: decodeHtml(s.title || s.song || 'Unknown'),
+          artist: decodeHtml(s.subtitle || mi.singers || mi.primary_artists || s.primary_artists || 'Unknown Artist'),
+          album: mi.album || s.album || '',
+          img: fixUrl(s.image || '').replace('150x150', '500x500').replace('50x50', '500x500'),
+          duration: parseInt(mi.duration || s.duration) || 0,
+          encUrl: fixUrl(mi.encrypted_media_url || s.encrypted_media_url || mi.media_url || s.media_url || '')
+        };
+      });
+      // Remove duplicates by title+artist combination
+      return deduplicateSongs(results);
+    }
+
+    async function getPlayUrl(encUrl) {
+      const url = `https://www.jiosaavn.com/api.php?__call=song.generateAuthToken&_format=json&_marker=0&api_version=4&ctx=web6dot0&bitrate=320&url=${encodeURIComponent(fixUrl(encUrl))}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Auth failed');
+      const text = await res.text();
+      const j = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
+      const data = JSON.parse(j);
+      const u = fixUrl(data?.auth_url || data?.url || '');
+      if (!u) throw new Error('No URL');
+      return u;
+    }
+
+    async function getSimilarSongs(artist, title) {
+      try {
+        let results = [];
+        const mainArtist = (artist || '').split(',')[0].split('-')[0].trim();
+        if (mainArtist) {
+          results = await searchJioSaavn(mainArtist, 15);
+          results = results.filter(s => s.title.toLowerCase() !== title.toLowerCase() && s.encUrl);
+        }
+
+        if (!results.length && title) {
+          const mainTitle = (title || '').split(/[(\[\-]/)[0].trim();
+          if (mainTitle.length > 2) {
+            results = await searchJioSaavn(mainTitle + ' song', 10);
+            results = results.filter(s => s.title.toLowerCase() !== title.toLowerCase() && s.encUrl);
+          }
+        }
+
+        if (!results.length) {
+          results = await searchJioSaavn('top english songs 2024', 15);
+          results = results.filter(s => s.title.toLowerCase() !== title.toLowerCase() && s.encUrl);
+        }
+        return deduplicateSongs(results);
+      } catch (e) {
+        try { return await searchJioSaavn('trending hits', 10); } catch (ex) { return []; }
+      }
+    }
+    // ═══════════════ HOME PAGE ═══════════════
+    const HOME_SECTIONS = [
+      { label: '🔥 Trending Now', query: 'trending hits 2024', icon: 'ti-trending-up' },
+      { label: '💕 Bollywood Hits', query: 'bollywood hits 2024', icon: 'ti-music' },
+      { label: '🎸 English Top Songs', query: 'top english songs 2024', icon: 'ti-headphones' },
+      { label: '🌙 Phonk & Lo-fi', query: 'phonk lo-fi chill', icon: 'ti-moon' },
+      { label: '🎤 Arijit Singh', query: 'arijit singh best songs', icon: 'ti-microphone' },
+      { label: '🕺 Party Mix', query: 'party dance hits', icon: 'ti-confetti' },
+      { label: '😌 Old Hindi Classics', query: 'kishore kumar rafi old hindi', icon: 'ti-vintage' },
+      { label: '🌟 90s Hits', query: '90s hindi hits', icon: 'ti-star' },
+    ];
+    let homeData = {};
+
+    async function loadHomeSection(query, key) {
+      if (homeData[key]) return homeData[key];
+      try {
+        const r = await searchJioSaavn(query, 10);
+        // Already deduplicated in searchJioSaavn
+        homeData[key] = deduplicateSongs(r.filter(s => s.encUrl));
+        return homeData[key];
+      } catch (e) { return []; }
+    }
+
+    // Auto-refresh trending every 15 minutes
+    setInterval(async () => {
+      try {
+        const query = 'trending hits 2024';
+        const r = await searchJioSaavn(query, 10);
+        homeData[query] = r.filter(s => s.encUrl);
+        if (page === 'home') renderHome();
+      } catch (e) { }
+    }, 15 * 60 * 1000);
+
+    async function renderHome() {
+      const c = document.getElementById('content');
+      c.innerHTML = '<div class="spinner"><i class="ti ti-loader"></i><p>Loading your home...</p></div>';
+
+      // Personalized chips based on history
+      const recentArtists = [...new Set(history.filter(h => h.source === 'saavn').map(h => h.artist).filter(Boolean))].slice(0, 5);
+
+      let html = '';
+
+      // Smart suggestion chips
+      if (recentArtists.length) {
+        html += `<div class="home-section"><div class="home-section-title"><i class="ti ti-sparkles"></i> Based on your taste</div>`;
+        html += `<div class="suggestions-bar">`;
+        recentArtists.forEach(a => {
+          html += `<div class="sug-chip" onclick="searchByArtist('${esc(a)}')">${esc(a)}</div>`;
+        });
+        html += `</div></div>`;
+      }
+
+      // Recent history quick play
+      if (history.length) {
+        html += `<div class="home-section"><div class="home-section-title"><i class="ti ti-history"></i> Recently Played</div><div class="songs-scroll">`;
+        history.slice(0, 10).forEach((h, i) => {
+          html += `<div class="song-card-h" onclick="replayHistory(${i})">
+        <div class="card-art-h">${h.img ? `<img src="${esc(h.img)}" onerror="this.outerHTML='🎵'">` : '🎵'}
+        <div class="card-play-overlay"><i class="ti ti-player-play"></i></div></div>
+        <div class="card-name-h">${esc(h.title)}</div>
+        <div class="card-artist-h">${esc(h.artist || '')}</div>
+      </div>`;
+        });
+        html += `</div></div>`;
+      }
+
+      c.innerHTML = html + '<div id="home-sections"></div>';
+
+      // Load sections async
+      const sec = document.getElementById('home-sections');
+      for (const s of HOME_SECTIONS) {
+        const key = s.query;
+        const songs = await loadHomeSection(s.query, key);
+        if (!songs.length) continue;
+        let sh = `<div class="home-section"><div class="home-section-title"><i class="ti ${s.icon}"></i> ${s.label}</div><div class="songs-scroll">`;
+        songs.forEach((song, i) => {
+          sh += `<div class="song-card-h" onclick="playStreamSong(${JSON.stringify(song).replace(/"/g, '&quot;')})">
+        <div class="card-art-h">${song.img ? `<img src="${esc(song.img)}" onerror="this.outerHTML='🎵'">` : '🎵'}
+        <div class="card-play-overlay"><i class="ti ti-player-play"></i></div></div>
+        <div class="card-name-h">${esc(song.title)}</div>
+        <div class="card-artist-h">${esc(song.artist)}</div>
+      </div>`;
+        });
+        sh += `</div></div>`;
+        sec.innerHTML += sh;
+      }
+    }
+
+    async function searchByArtist(artist) {
+      document.getElementById('saavn-search').value = artist;
+      goPage('search');
+      await doSearch();
+    }
+
+    // ═══════════════ SEARCH ═══════════════
+    let sugT = null;
+    async function fetchSug(val) {
+      clearTimeout(sugT); const box = document.getElementById('sug-box');
+      if (!val || val.length < 2) { box.classList.remove('show'); return }
+      sugT = setTimeout(async () => {
+        try {
+          const r = await searchJioSaavn(val, 5);
+          if (!r.length) { box.classList.remove('show'); return }
+          box.innerHTML = r.map(s => `<div class="suggest-item" onclick="pickSug('${esc(s.title.replace(/'/g, "\\'"))}')">
+        ${s.img ? `<img src="${esc(s.img)}" onerror="this.style.display='none'">` : '<div style="width:36px;height:36px;background:var(--bg4);border-radius:4px;flex-shrink:0"></div>'}
+        <div><div class="si-title">${esc(s.title)}</div><div class="si-sub">${esc(s.artist)}</div></div>
+      </div>`).join('');
+          box.classList.add('show');
+        } catch (e) { box.classList.remove('show') }
+      }, 350);
+    }
+    function pickSug(t) { document.getElementById('saavn-search').value = t; hideSug(); doSearch(); }
+    function hideSug() { document.getElementById('sug-box').classList.remove('show') }
+    document.addEventListener('click', e => { if (!e.target.closest('.suggest-wrap')) hideSug() });
+
+    async function doSearch() {
+      const q2 = document.getElementById('saavn-search').value.trim();
+      if (!q2) return;
+      hideSug();
+      const c = document.getElementById('content');
+      c.innerHTML = '<div class="spinner"><i class="ti ti-loader"></i><p>Searching...</p></div>';
+      try {
+        // Fetch multiple pages to get more results
+        const [page1, page2] = await Promise.all([
+          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=1&q=${encodeURIComponent(q2)}`).then(r => r.json()),
+          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=2&q=${encodeURIComponent(q2)}`).then(r => r.json()).catch(() => ({ results: [] }))
+        ]);
+        const allRaw = [...(page1?.results || []), ...(page2?.results || [])];
+        if (!allRaw.length) throw new Error('No songs found');
+        // Parse and deduplicate
+        const mapped = allRaw.map(s => {
+          const mi = s.more_info || {};
+          return {
+            id: s.id || '',
+            title: s.title || s.song || 'Unknown',
+            artist: s.subtitle || mi.singers || mi.primary_artists || 'Unknown Artist',
+            album: mi.album || s.album || '',
+            img: fixUrl(s.image || '').replace('150x150', '500x500').replace('50x50', '500x500'),
+            duration: parseInt(mi.duration || s.duration) || 0,
+            encUrl: fixUrl(mi.encrypted_media_url || s.encrypted_media_url || mi.media_url || s.media_url || '')
+          };
+        });
+        saavnResults = deduplicateSongs(mapped);
+        renderSearchResults();
+      } catch (err) {
+        c.innerHTML = `<div class="empty"><i class="ti ti-alert-circle" style="color:#e24b4a"></i><p>Search failed.<br><small>${esc(err.message)}</small></p></div>`;
+      }
+    }
+
+    function renderSearchResults() {
+      const c = document.getElementById('content');
+      let html = `<div class="sec-title">🎵 Results <small>${saavnResults.length} songs</small></div>`;
+      html += `<div class="track-hdr"><span style="width:36px"></span><span>Title</span><span>Artist</span><span>Duration</span><span></span></div>`;
+      saavnResults.forEach((s, i) => {
+        const isP = currentStream && currentStream.id === s.id;
+        const isLk = likedStreams.some(l => l.id === s.id);
+        html += `<div class="track-row${isP ? ' playing' : ''}" onclick="playStreamSong(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+      <div>${s.img ? `<img class="t-art-img" src="${esc(s.img)}" onerror="this.outerHTML='<div class=t-art-emoji>🎵</div>'">` : '<div class="t-art-emoji">🎵</div>'}</div>
+      <div class="t-info"><div class="t-name">${esc(s.title)}</div><div class="t-artist">${esc(s.artist)}</div></div>
+      <div class="t-col">${esc(s.artist)}</div>
+      <div class="t-dur">${ft(s.duration)}</div>
+      <div class="t-acts" onclick="event.stopPropagation()">
+        <button class="${isLk ? 'liked' : ''}" onclick="toggleLikeStream(${JSON.stringify(s).replace(/"/g, '&quot;')})" title="Like"><i class="ti ti-heart${isLk ? '-filled' : ''}"></i></button>
+        <button onclick="downloadStream(${JSON.stringify(s).replace(/"/g, '&quot;')})" title="Save to My Songs"><i class="ti ti-download"></i></button>
+      </div>
+    </div>`;
+      });
+      c.innerHTML = html;
+    }
+
+    // ═══════════════ STREAM PLAYBACK ═══════════════
+    async function playStreamSong(s, fromQueue) {
+      if (typeof s === 'string') s = JSON.parse(s);
+      toast('Loading "' + s.title + '"...');
+      audio.pause(); audio.src = ''; playing = false; curIdx = -1;
+      currentStream = s;
+      // Track position in stream queue for next/prev
+      if (!fromQueue && currentStreamQueue.length) {
+        const qi = currentStreamQueue.findIndex(t => t.id === s.id || (t.title === s.title && t.artist === s.artist));
+        if (qi >= 0) currentStreamIdx = qi;
+      }
+      resetProgress();
+      setPlayerInfo(s.img, s.title, s.artist, 'stream');
+      try {
+        if (!s.encUrl) {
+          const r = await searchJioSaavn(s.title + ' ' + s.artist, 1);
+          if (r.length && r[0].encUrl) s.encUrl = r[0].encUrl;
+          else throw new Error('No URL');
+        }
+        const url = await getPlayUrl(s.encUrl);
+        audio.src = url;
+        await audio.play();
+        playing = true;
+        document.getElementById('play-ico').className = 'ti ti-player-pause';
+        toast('♪ ' + s.title);
+        addToHistory({ title: s.title, artist: s.artist, img: s.img, source: 'saavn', encUrl: s.encUrl, id: s.id });
+        updateSessionContext(s);
+        updateLikeBtn();
+        if (page === 'search') renderSearchResults();
+        if (page === 'history') renderHistory();
+      } catch (e) {
+        console.error(e);
+        toast('Cannot play — try another song');
+      }
+    }
+
+    // ═══════════════ SMART AUTO-PLAY ═══════════════
+    audio.addEventListener('ended', async () => {
+      playing = false;
+      if (repeat) { audio.currentTime = 0; audio.play().then(() => { playing = true }).catch(() => { }); return; }
+      if (curIdx >= 0) { nextTrack(); return; }
+      if (currentStream) {
+        // If playing from a stream playlist queue, go to next in queue
+        if (currentStreamQueue.length && currentStreamIdx >= 0) {
+          const nextIdx = shuffle
+            ? getSmartShuffleNext(currentStreamQueue, currentStream)
+            : (currentStreamIdx + 1) % currentStreamQueue.length;
+          currentStreamIdx = nextIdx !== -1 ? nextIdx : 0;
+          await playStreamSong(currentStreamQueue[currentStreamIdx], true);
+          return;
+        }
+        // Fallback: find similar songs
+        try {
+          const similar = await getSimilarSongs(currentStream.artist, currentStream.title);
+          if (similar.length) {
+            const nextIdx = getSmartShuffleNext(similar, currentStream);
+            const next = similar[nextIdx !== -1 ? nextIdx : 0];
+            await playStreamSong(next);
+          }
+        } catch (e) { }
+      }
+    });
+
+    // ═══════════════ LIKE STREAMS ═══════════════
+    function toggleLikeStream(s) {
+      if (typeof s === 'string') s = JSON.parse(s);
+      const idx = likedStreams.findIndex(l => l.id === s.id);
+      if (idx < 0) { likedStreams.push(s); toast('❤️ Liked: ' + s.title); }
+      else { likedStreams.splice(idx, 1); toast('Removed from liked'); }
+      scheduleSave();
+      updateLikeBtn();
+      if (page === 'search') renderSearchResults();
+      if (page === 'liked') renderLiked();
+    }
+
+    function likeCurrentSong() {
+      if (curIdx >= 0) {
+        // Local song
+        const t = library[curIdx];
+        const lk = playlists.find(p => p.id === 'liked');
+        const i = lk.tracks.indexOf(t.id);
+        if (i < 0) { lk.tracks.push(t.id); toast('❤️ Liked: ' + t.title); }
+        else { lk.tracks.splice(i, 1); toast('Removed from liked'); }
+        render(); renderSidebar(); updateLikeBtn(); scheduleSave();
+      } else if (currentStream) {
+        toggleLikeStream(currentStream);
+      }
+    }
+
+    function isStreamLiked(id) { return likedStreams.some(l => l.id === id) }
+
+    // ═══════════════ DOWNLOAD STREAM ═══════════════
+    async function downloadStream(s) {
+      if (typeof s === 'string') s = JSON.parse(s);
+      toast('Saving "' + s.title + '" to My Songs...');
+      try {
+        const encUrl = s.encUrl || (await searchJioSaavn(s.title + ' ' + s.artist, 1))[0]?.encUrl;
+        if (!encUrl) throw new Error('No URL');
+        const playUrl = await getPlayUrl(encUrl);
+        const res = await fetch(playUrl);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const song = { id: uid(), title: s.title, artist: s.artist, url, emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)], img: s.img || '', duration: s.duration || 0 };
+        library.push(song);
+        await dbPut('songs', { id: song.id, blob, title: song.title, artist: song.artist, emoji: song.emoji, img: song.img, duration: song.duration });
+        await saveMeta();
+        toast('✓ "' + s.title + '" saved to My Songs!');
+        renderSidebar();
+      } catch (e) { toast('Save failed: ' + e.message) }
+    }
+
+    // ═══════════════ IMPORT SYSTEM ═══════════════
+
+    // ── Spotify Account Connect / Disconnect ──
+    async function connectSpotify() {
+      const btn = document.getElementById('spotify-connect-btn');
+      if (btn) { btn.innerHTML = '<i class="ti ti-loader"></i> Opening Spotify...'; btn.disabled = true; }
+      try {
+        const { ipcRenderer } = window.require('electron');
+        const result = await ipcRenderer.invoke('spotify-login-window');
+        if (result && result.hasToken) {
+          window._spotifyConnected = true;
+          window._spotifyEmail = result.email || '';
+          toast('\u2713 Spotify connected! Full playlists will now import.');
+          renderImport();
+        } else {
+          toast('Spotify login cancelled — try again');
+          renderImport();
+        }
+      } catch (e) {
+        toast('Could not open Spotify login: ' + e.message);
+        renderImport();
+      }
+    }
+
+    function disconnectSpotify() {
+      window._spotifyConnected = false;
+      window._spotifyEmail = '';
+      try {
+        const { ipcRenderer } = window.require('electron');
+        ipcRenderer.invoke('spotify-disconnect');
+      } catch (e) { }
+      toast('Spotify disconnected');
+      renderImport();
+    }
+
+    // ── Ask main process to fetch URL (bypasses ALL CORS/cookie restrictions) ──
+    async function mainFetch(url, headers = {}) {
+      try {
+        const { ipcRenderer } = window.require('electron');
+        const res = await ipcRenderer.invoke('fetch-url', { url, headers });
+        if (res.error) throw new Error(res.error);
+        return res.text;
+      } catch (e) { throw e; }
+    }
+
+    // ── Relevance check: skip junk JioSaavn results ──
+    function isRelevantMatch(searchTitle, resultTitle) {
+      const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+      const st = norm(searchTitle), rt = norm(resultTitle);
+      const words = st.split(/\s+/).filter(w => w.length > 3);
+      if (!words.length) return true;
+      return words.some(w => rt.includes(w));
+    }
+
+    function renderImport() {
+      var _connected = window._spotifyConnected || false;
+      var _email = window._spotifyEmail || '';
+
+      var connectHtml;
+      if (_connected) {
+        connectHtml = '<div style="display:flex;align-items:center;gap:12px;background:rgba(30,215,96,.08);border:1px solid var(--accent);border-radius:10px;padding:13px 16px">'
+          + '<i class="ti ti-brand-spotify" style="font-size:22px;color:var(--accent)"></i>'
+          + '<div style="flex:1">'
+          + '<div style="font-size:13px;font-weight:700;color:var(--accent)">&#10003; Spotify Connected</div>'
+          + '<div style="font-size:11px;color:var(--t3);margin-top:2px">' + (_email ? 'Logged in: ' + _email : 'Full playlist import enabled') + '</div>'
+          + '</div>'
+          + '<button onclick="disconnectSpotify()" style="background:none;border:1px solid var(--bdr);color:var(--t3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit">Disconnect</button>'
+          + '</div>';
+      } else {
+        connectHtml = '<button onclick="connectSpotify()" id="spotify-connect-btn"'
+          + ' style="display:flex;align-items:center;gap:10px;background:#1ed760;color:#000;border:none;padding:12px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;width:100%;justify-content:center">'
+          + '<i class="ti ti-brand-spotify" style="font-size:20px"></i>&nbsp; Connect Spotify Account'
+          + '</button>'
+          + '<p style="color:var(--t3);font-size:11px;margin-top:8px;text-align:center">A Spotify login window opens once — WAVE remembers your session for all future imports.</p>';
+      }
+
+      document.getElementById('content').innerHTML =
+        '<div class="import-box">'
+        + '<h3><i class="ti ti-brand-spotify"></i> Connect Spotify Account</h3>'
+        + '<p style="color:var(--t2);font-size:12px;margin-bottom:14px;line-height:1.8">Connect once to import playlists with <strong>200+ songs</strong>. Without login, only the first 99 tracks can be read from Spotify.</p>'
+        + connectHtml
+        + '</div>'
+
+        + '<div class="import-box">'
+        + '<h3><i class="ti ti-brand-spotify"></i> Import Spotify Playlist</h3>'
+        + '<p style="color:var(--t2);font-size:12px;margin-bottom:14px;line-height:1.8">Paste any <strong>public</strong> Spotify playlist link. WAVE finds each song on JioSaavn automatically.</p>'
+        + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+        + '<input id="spotify-url" type="text" placeholder="https://open.spotify.com/playlist/..." style="flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:10px 13px;color:var(--t1);font-size:13px;font-family:inherit;outline:none" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--bdr)\'" onkeydown="if(event.key===\'Enter\')importSpotifyPlaylist()">'
+        + '<button onclick="importSpotifyPlaylist()" style="background:var(--accent);color:#000;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;white-space:nowrap"><i class="ti ti-download"></i> Import</button>'
+        + '</div>'
+        + '<div style="background:var(--bg3);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--t3);line-height:1.8"><strong style="color:var(--t2)">How to get the link:</strong> Open Spotify &#8594; your playlist &#8594; &#8226;&#8226;&#8226; &#8594; Share &#8594; Copy playlist link &#8594; paste above</div>'
+        + '<div id="import-result" style="margin-top:14px"></div>'
+        + '</div>'
+
+        + '<div class="import-box">'
+        + '<h3><i class="ti ti-list"></i> Manual Import &#8212; Paste Song Names</h3>'
+        + '<p style="color:var(--t2);font-size:12px;margin-bottom:12px;line-height:1.7">Paste song names &#8212; <strong>one per line.</strong><br>Format: <code style="background:var(--bg4);padding:1px 6px;border-radius:3px">Song Name - Artist</code></p>'
+        + '<textarea id="manual-songs" placeholder="Tum Hi Ho - Arijit Singh&#10;Apna Bana Le&#10;Die With A Smile - Lady Gaga&#10;Kesariya&#10;Blinding Lights - The Weeknd&#10;Chaiyya Chaiyya&#10;Levitating - Dua Lipa" style="width:100%;background:var(--bg3);border:1px solid var(--accent);border-radius:8px;padding:12px;color:var(--t1);font-family:inherit;font-size:13px;outline:none;resize:vertical;min-height:140px;margin-bottom:12px;line-height:1.8"></textarea>'
+        + '<button onclick="importManual()" style="background:var(--accent);color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700"><i class="ti ti-player-play"></i> Find & Play All Songs</button>'
+        + '<div id="import-progress" style="margin-top:14px"></div>'
+        + '</div>';
+    }
+
+    // connectSpotify() and disconnectSpotify() are defined above (lines 689-718)
+    // They set window._spotifyConnected and call renderImport() properly
+
+    async function importSpotifyPlaylist() {
+      const inputUrl = document.getElementById('spotify-url').value.trim();
+      if (!inputUrl) { toast('Please paste a Spotify playlist URL'); return; }
+      const match = inputUrl.match(/playlist\/([a-zA-Z0-9]+)/);
+      if (!match) { toast('Invalid URL — paste a full Spotify playlist link'); return; }
+      const plId = match[1];
+      const result = document.getElementById('import-result');
+      const { ipcRenderer } = window.require('electron');
+      function dbg(msg) { console.log('[WAVE Import]', msg); }
+      // Check token and update connection status
+      try {
+        const tok = await ipcRenderer.invoke('get-spotify-token');
+        window._spotifyConnected = !!tok;
+      } catch (e) { }
+
+      if (!window._spotifyConnected) {
+        result.innerHTML = '<div style="background:rgba(255,180,0,.1);border:1px solid #ffb400;border-radius:8px;padding:9px 13px;font-size:12px;color:#ffb400;margin-bottom:10px">'
+          + '&#9888;&#65039; No Spotify token &#8212; connect your Spotify account for full playlists. '
+          + '<span onclick="connectSpotify()" style="text-decoration:underline;cursor:pointer;color:var(--accent);margin-left:6px">Connect now &#8594;</span>'
+          + '</div><div class="spinner"><i class="ti ti-loader"></i><p>Fetching tracks from Spotify...</p></div>';
+      } else {
+        result.innerHTML = '<div class="spinner"><i class="ti ti-loader"></i><p>Fetching all tracks from Spotify... (10-15 sec)</p></div>';
+      }
+
+      let plName = 'Spotify Playlist';
+      let tracks = [];
+
+      // Fetch via main process — uses saved token to paginate all tracks
+      try {
+        const spResult = await ipcRenderer.invoke('fetch-spotify-playlist', { playlistId: plId });
+        dbg('Result: ' + (spResult.tracks ? spResult.tracks.length : 0) + ' tracks, error: ' + (spResult.error || 'none'));
+        if (spResult.tracks && spResult.tracks.length) {
+          tracks = spResult.tracks;
+          plName = spResult.name || plName;
+        }
+      } catch (ex) { dbg('IPC err: ' + ex.message); }
+
+      // Fallback: scrape embed page via net module
+      if (!tracks.length) {
+        try {
+          result.innerHTML = '<div class="spinner"><i class="ti ti-loader"></i><p>Trying alternate method...</p></div>';
+          function tryJSON(t) { try { return JSON.parse(t); } catch (e) { return null; } }
+          const html = await mainFetch('https://open.spotify.com/embed/playlist/' + plId, {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'text/html', 'Referer': 'https://open.spotify.com/'
+          });
+          const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+          if (m) {
+            const j = tryJSON(m[1]);
+            const entity = j && j.props && j.props.pageProps && j.props.pageProps.state &&
+              j.props.pageProps.state.data && j.props.pageProps.state.data.entity;
+            if (entity && Array.isArray(entity.trackList)) {
+              tracks = entity.trackList.map(i => ({
+                title: (i.title || '').trim(),
+                artist: (i.subtitle || '').trim()
+              })).filter(t => t.title);
+              if (entity.name) plName = entity.name;
+              dbg('Embed fallback: ' + tracks.length + ' tracks');
+            }
+          }
+        } catch (ex) { dbg('Embed err: ' + ex.message); }
+      }
+
+      if (!tracks.length) {
+        result.innerHTML = `<div style="background:rgba(226,75,74,.1);border:1px solid #e24b4a;border-radius:8px;padding:14px">
+      <p style="color:#e24b4a;font-weight:700;font-size:13px;margin-bottom:6px">⚠️ Could not read playlist</p>
+      <p style="color:var(--t2);font-size:12px;margin-bottom:8px">Make sure the playlist is <strong>Public</strong> on Spotify.</p>
+      <p style="color:var(--t3);font-size:11px">To make it public: Open Spotify → your playlist → ••• → Make public</p>
+    </div>`;
+        return;
+      }
+
+      result.innerHTML = `<div style="color:var(--accent);font-size:13px;padding:10px 14px;background:rgba(30,215,96,.1);border-radius:8px;margin-bottom:8px">
+    ✓ Found <strong>${tracks.length} songs</strong> in "<strong>${esc(plName)}</strong>" — searching JioSaavn...
+  </div>`;
+      dbg('Found ' + tracks.length + ' tracks');
+      await importTracklist(tracks, plName, 'import-result');
+    }
+
+
+    async function importManual() {
+      const text = document.getElementById('manual-songs').value.trim();
+      if (!text) { toast('Please enter some song names'); return; }
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const tracks = lines.map(l => {
+        const idx = l.indexOf(' - ');
+        if (idx > 0) return { title: l.slice(0, idx).trim(), artist: l.slice(idx + 3).trim() };
+        return { title: l, artist: '' };
+      }).filter(t => t.title);
+      if (!tracks.length) { toast('No valid songs found'); return; }
+      await importTracklist(tracks, 'My Playlist', 'import-progress');
+    }
+
+    async function importTracklist(tracks, name, resultElId) {
+      const prog = document.getElementById(resultElId || 'import-progress') || document.getElementById('content');
+      const total = Math.min(tracks.length, 300);
+      const found = [];
+      let skipped = 0;
+
+      function updateProgress(done, lastTitle) {
+        const pct = Math.round((done / total) * 100);
+        prog.innerHTML = `
+      <div style="background:var(--bg3);border-radius:10px;padding:14px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:8px">
+          <span>Searching JioSaavn... <span style="color:var(--t3)">(${skipped} not found)</span></span>
+          <span style="color:var(--accent);font-weight:700">${found.length} found / ${done} searched</span>
+        </div>
+        <div style="height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:8px">
+          <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px;transition:width .3s"></div>
+        </div>
+        ${lastTitle ? `<p style="font-size:11px;color:var(--t3)">✓ ${esc(lastTitle)}</p>` : '<p style="font-size:11px;color:var(--t3)">Searching...</p>'}
+      </div>`;
+      }
+
+      updateProgress(0, '');
+      for (let i = 0; i < total; i++) {
+        const t = tracks[i];
+        console.log(`Searching for track ${i + 1}/${total}:`, t.title, '-', t.artist);
+        try {
+          const q = t.title + (t.artist ? ' ' + t.artist : '');
+          let results = await searchJioSaavn(q, 5);
+          let match = results.find(r => isRelevantMatch(t.title, r.title) && r.encUrl);
+          if (!match && t.artist) {
+            const r2 = await searchJioSaavn(t.title, 5);
+            match = r2.find(r => isRelevantMatch(t.title, r.title) && r.encUrl);
+          }
+          if (match) { found.push(match); updateProgress(i + 1, match.title); }
+          else { skipped++; updateProgress(i + 1, ''); }
+        } catch (e) { skipped++; updateProgress(i + 1, ''); }
+        await new Promise(res => setTimeout(res, 150));
+      }
+
+      if (!found.length) {
+        prog.innerHTML = '<div class="empty"><i class="ti ti-music-off"></i><p>No songs found on JioSaavn.<br><small>Try manual import with different names.</small></p></div>';
+        return;
+      }
+
+      const plId = 'pl_' + (nextPId++);
+      // Store streamTracks so playlist page can show & play them
+      const newPl = { id: plId, name, icon: '🎵', tracks: [], streamTracks: found };
+      playlists.push(newPl);
+      saavnResults = found;
+      renderSidebar();
+      await saveMeta();
+
+      prog.innerHTML = `
+    <div style="background:rgba(30,215,96,.1);border:1px solid var(--accent);border-radius:10px;padding:16px;text-align:center">
+      <p style="color:var(--accent);font-size:16px;font-weight:700;margin-bottom:4px">✅ ${found.length} / ${total} songs imported!</p>
+      ${skipped > 0 ? `<p style="color:var(--t3);font-size:11px;margin-bottom:8px">${skipped} songs not available on JioSaavn</p>` : ''}
+      <p style="color:var(--t2);font-size:12px;margin-bottom:14px">"${esc(name)}" saved to your sidebar</p>
+      <button onclick="goPage('playlist','${plId}')" style="background:var(--accent);color:#000;border:none;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin-right:8px">
+        <i class="ti ti-list"></i> View Playlist
+      </button>
+      <button onclick="playImported('${plId}')" style="background:var(--bg3);color:var(--t1);border:1px solid var(--bdr);padding:9px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">
+        <i class="ti ti-player-play"></i> Play Now
+      </button>
+    </div>`;
+      toast('✓ ' + found.length + ' songs imported into "' + name + '"!');
+    }
+
+    function playImported(plId) {
+      const pl = plId ? playlists.find(p => p.id === plId) : null;
+      const queue = pl?.streamTracks || saavnResults;
+      if (!queue.length) return;
+      // Set current stream queue so next/prev work within this playlist
+      currentStreamQueue = queue;
+      currentStreamIdx = 0;
+      playStreamSong(queue[0]);
+    }
+    // ═══════════════ HISTORY ═══════════════
+    function addToHistory(item) {
+      history = history.filter(h => !(h.source === item.source && h.title === item.title));
+      history.unshift({ ...item, playedAt: Date.now() });
+      if (history.length > 100) history = history.slice(0, 100);
+      scheduleSave();
+    }
+    function timeAgo(ts) {
+      const s = Math.floor((Date.now() - ts) / 1000);
+      if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + 'm ago';
+      if (s < 86400) return Math.floor(s / 3600) + 'h ago'; return Math.floor(s / 86400) + 'd ago';
+    }
+    function renderHistory() {
+      const c = document.getElementById('content');
+      if (!history.length) { c.innerHTML = '<div class="empty"><i class="ti ti-history"></i><p>No songs played yet.</p></div>'; return }
+      let html = '<div class="sec-title">🕐 Recently Played <small>' + history.length + ' songs</small></div>';
+      history.forEach((h, i) => {
+        html += `<div class="hist-row" onclick="replayHistory(${i})">
+      <div class="hist-art">${h.img ? `<img src="${esc(h.img)}" onerror="this.outerHTML='🎵'">` : (h.emoji || '🎵')}</div>
+      <div class="hist-meta">
+        <div class="hist-title">${esc(h.title)} <span class="src-badge ${h.source === 'saavn' ? 'saavn' : 'local'}">${h.source === 'saavn' ? 'STREAM' : 'LOCAL'}</span></div>
+        <div class="hist-sub">${esc(h.artist || '')}</div>
+      </div>
+      <div class="hist-time">${timeAgo(h.playedAt)}</div>
+    </div>`;
+      });
+      c.innerHTML = html;
+    }
+    async function replayHistory(i) {
+      const h = history[i]; if (!h) return;
+      if (h.source === 'local' && h.id) { playLocal(h.id); return; }
+      if (h.source === 'saavn') {
+        if (h.encUrl) { await playStreamSong(h); }
+        else {
+          toast('Searching for "' + h.title + '"...');
+          try { const r = await searchJioSaavn(h.title, 3); if (r.length) await playStreamSong(r[0]); else toast('Song not found'); }
+          catch (e) { toast('Could not play'); }
+        }
+      }
+    }
+
+    // ═══════════════ LIKED STREAMS PAGE ═══════════════
+    function renderLiked() {
+      const c = document.getElementById('content');
+      const localLiked = library.filter(t => playlists.find(p => p.id === 'liked').tracks.includes(t.id));
+      let html = '<div class="sec-title">❤️ Liked Songs <small>' + (localLiked.length + likedStreams.length) + ' songs</small></div>';
+      // Local liked
+      if (localLiked.length) {
+        html += `<div style="font-size:11px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;padding:4px 10px;margin-bottom:4px">MY SONGS</div>`;
+        localLiked.forEach(t => {
+          const p = curIdx >= 0 && library[curIdx]?.id === t.id;
+          html += `<div class="track-row${p ? ' playing' : ''}" onclick="handleTrackClick('${t.id}')">
+        <div>${t.img ? `<img class="t-art-img" src="${esc(t.img)}">` : `<div class="t-art-emoji">${t.emoji || '🎵'}</div>`}</div>
+        <div class="t-info"><div class="t-name">${esc(t.title)}</div><div class="t-artist">${esc(t.artist)}</div></div>
+        <div class="t-col">${esc(t.artist)}</div>
+        <div class="t-dur">${ft(t.duration)}</div>
+        <div class="t-acts" onclick="event.stopPropagation()">
+          <button class="liked" onclick="toggleLike('${t.id}')"><i class="ti ti-heart-filled"></i></button>
+        </div>
+      </div>`;
+        });
+      }
+      // Stream liked
+      if (likedStreams.length) {
+        html += `<div style="font-size:11px;color:var(--t3);letter-spacing:1px;text-transform:uppercase;padding:12px 10px 4px;margin-bottom:4px">STREAMED SONGS</div>`;
+        likedStreams.forEach((s, i) => {
+          const isP = currentStream && currentStream.id === s.id;
+          html += `<div class="track-row${isP ? ' playing' : ''}" onclick="playStreamSong(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+        <div>${s.img ? `<img class="t-art-img" src="${esc(s.img)}" onerror="this.outerHTML='<div class=t-art-emoji>🎵</div>'">` : '<div class="t-art-emoji">🎵</div>'}</div>
+        <div class="t-info"><div class="t-name">${esc(s.title)}</div><div class="t-artist">${esc(s.artist)}</div></div>
+        <div class="t-col">${esc(s.artist)}</div>
+        <div class="t-dur">${ft(s.duration)}</div>
+        <div class="t-acts" onclick="event.stopPropagation()">
+          <button class="liked" onclick="toggleLikeStream(${JSON.stringify(s).replace(/"/g, '&quot;')})"><i class="ti ti-heart-filled"></i></button>
+          <button onclick="downloadStream(${JSON.stringify(s).replace(/"/g, '&quot;')})" title="Save"><i class="ti ti-download"></i></button>
+        </div>
+      </div>`;
+        });
+      }
+      if (!localLiked.length && !likedStreams.length) html = '<div class="empty"><i class="ti ti-heart"></i><p>Like songs to see them here.</p></div>';
+      c.innerHTML = html;
+    }
+
+    // ═══════════════ FILE UPLOAD ═══════════════
+    async function handleFiles(files) {
+      const arr = Array.from(files).filter(f => f.type.startsWith('audio/'));
+      if (!arr.length) return; toast('Importing...');
+      for (const f of arr) {
+        const blob = new Blob([await f.arrayBuffer()], { type: f.type });
+        const url = URL.createObjectURL(blob);
+        const raw = f.name.replace(/\.[^/.]+$/, '');
+        const pts = raw.split(' - ');
+        const title = pts.length > 1 ? pts.slice(1).join(' - ').trim() : raw.trim();
+        const artist = pts.length > 1 ? pts[0].trim() : 'Unknown Artist';
+        const song = { id: uid(), title, artist, url, emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)], img: '', duration: 0 };
+        await new Promise(res => { const tmp = new Audio(url); tmp.addEventListener('loadedmetadata', () => { song.duration = tmp.duration; res() }); tmp.addEventListener('error', res); setTimeout(res, 3000) });
+        library.push(song);
+        await dbPut('songs', { id: song.id, blob, title, artist, emoji: song.emoji, img: '', duration: song.duration });
+      }
+      await saveMeta(); toast(arr.length + ' song' + (arr.length > 1 ? 's' : '') + ' saved!'); render(); renderSidebar();
+    }
+
+    // ═══════════════ NAVIGATION ═══════════════
+    function goPage(p, plId) {
+      page = p; activePl = plId || null; q = '';
+      if (document.getElementById('local-search')) document.getElementById('local-search').value = '';
+      const ids = ['nav-home', 'nav-search', 'nav-lib', 'nav-liked', 'nav-hist', 'nav-import', 'nav-merge', 'nav-settings'];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('active') });
+      if (p === 'home') document.getElementById('nav-home')?.classList.add('active');
+      if (p === 'search') document.getElementById('nav-search')?.classList.add('active');
+      if (p === 'library') document.getElementById('nav-lib')?.classList.add('active');
+      if (p === 'liked') document.getElementById('nav-liked')?.classList.add('active');
+      if (p === 'history') document.getElementById('nav-hist')?.classList.add('active');
+      if (p === 'import') document.getElementById('nav-import')?.classList.add('active');
+      if (p === 'merge') document.getElementById('nav-merge')?.classList.add('active');
+      if (p === 'settings') document.getElementById('nav-settings')?.classList.add('active');
+      const isSearch = p === 'search';
+      const isLocal = !isSearch && p !== 'home';
+      document.getElementById('local-hdr').style.display = isLocal ? 'flex' : 'none';
+      document.getElementById('search-hdr').style.display = isSearch ? 'block' : 'none';
+      render();
+    }
+    function localSearch(v) { q = v.toLowerCase(); render() }
+    function setTab(t) { tabView = t; document.getElementById('tab-list').classList.toggle('active', t === 'list'); document.getElementById('tab-grid').classList.toggle('active', t === 'grid'); render(); scheduleSave() }
+    function getVisible() {
+      let tr = library;
+      if (page === 'liked') { const ids = playlists.find(p => p.id === 'liked').tracks; tr = library.filter(t => ids.includes(t.id)); }
+      else if (page === 'playlist' && activePl) { const pl = playlists.find(p => p.id === activePl); if (pl) tr = library.filter(t => pl.tracks.includes(t.id)); }
+      if (q) tr = tr.filter(t => t.title.toLowerCase().includes(q) || t.artist.toLowerCase().includes(q));
+      return tr;
+    }
+    function curSongId() { return curIdx >= 0 ? library[curIdx]?.id : null }
+    function isLiked(id) { return playlists.find(p => p.id === 'liked').tracks.includes(id) }
+
+    // ═══════════════ RENDER ═══════════════
+    function render() {
+      if (page === 'home') { renderHome(); return }
+      if (page === 'search') { if (saavnResults.length > 0) renderSearchResults(); else document.getElementById('content').innerHTML = '<div class="empty"><i class="ti ti-search" style="font-size:56px;color:var(--accent)"></i><p style="font-size:15px;color:var(--t1);margin-bottom:8px"><strong>Search Any Song</strong></p><p>Type above and press Search.<br>Full quality streaming, completely free!</p></div>'; return }
+      if (page === 'history') { renderHistory(); return }
+      if (page === 'import') { renderImport(); return }
+      if (page === 'merge') { renderMerge(); return }
+      if (page === 'settings') { renderSettings(); return }
+      if (page === 'liked') { renderLiked(); return }
+      const c = document.getElementById('content');
+      // Check if active playlist is a stream playlist (imported from Spotify)
+      if (page === 'playlist' && activePl) {
+        const pl = playlists.find(p => p.id === activePl);
+        if (pl?.streamTracks?.length) {
+          renderStreamPlaylist(pl);
+          return;
+        }
+      }
+      const tracks = getVisible();
+      const title = page === 'playlist' && activePl ? (() => { const p = playlists.find(p => p.id === activePl); return p ? p.icon + ' ' + p.name : 'Playlist' })() : '🎵 My Songs';
+      let html = '';
+      if (page === 'library') html += `<div class="upload-zone" onclick="document.getElementById('f-in').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="this.classList.remove('drag');handleFiles(event.dataTransfer.files);event.preventDefault()"><i class="ti ti-cloud-upload"></i><p>Drop your music files here</p><small>MP3 · WAV · OGG · FLAC · M4A</small><div class="ubtn">Browse Files</div><input type="file" id="f-in" multiple accept="audio/*" onchange="handleFiles(this.files)" style="display:none"></div>`;
+      if (!tracks.length) { html += `<div class="sec-title">${title}</div><div class="empty"><i class="ti ti-music-off"></i><p>${page === 'library' ? 'Upload music above or use Search to stream!' : 'Playlist is empty.'}</p></div>`; }
+      else if (tabView === 'grid') {
+        html += `<div class="sec-title">${title} <small>${tracks.length} songs</small></div><div class="song-grid">`;
+        tracks.forEach(t => { const p = curSongId() === t.id; html += `<div class="song-card${p ? ' playing' : ''}" onclick="handleTrackClick('${t.id}')"><div class="card-art">${t.img ? `<img src="${esc(t.img)}">` : (t.emoji || '🎵')}</div><div class="card-name">${esc(t.title)}</div><div class="card-artist">${esc(t.artist)}</div></div>`; });
+        html += '</div>';
+      } else {
+        html += `<div class="sec-title">${title} <small>${tracks.length} songs</small></div><div class="track-hdr"><span style="width:36px"></span><span>Title</span><span>Artist</span><span>Duration</span><span></span></div>`;
+        tracks.forEach((t, i) => {
+          const p = curSongId() === t.id, lk = isLiked(t.id);
+          html += `<div class="track-row${p ? ' playing' : ''}" onclick="handleTrackClick('${t.id}')" oncontextmenu="showCtx(event,'${t.id}')">
+        <div>${t.img ? `<img class="t-art-img" src="${esc(t.img)}" onerror="this.outerHTML='<div class=t-art-emoji>${t.emoji || '🎵'}</div>'">` : `<div class="t-art-emoji">${t.emoji || '🎵'}</div>`}</div>
+        <div class="t-info"><div class="t-name">${esc(t.title)}</div><div class="t-artist">${esc(t.artist)}</div></div>
+        <div class="t-col">${esc(t.artist)}</div><div class="t-dur">${ft(t.duration)}</div>
+        <div class="t-acts" onclick="event.stopPropagation()">
+          <button class="${lk ? 'liked' : ''}" onclick="toggleLike('${t.id}')"><i class="ti ti-heart${lk ? '-filled' : ''}"></i></button>
+          <button onclick="showCtx(event,'${t.id}')"><i class="ti ti-dots"></i></button>
+        </div>
+      </div>`;
+        });
+      }
+      c.innerHTML = html;
+    }
+    function renderStreamPlaylist(pl) {
+      const c = document.getElementById('content');
+      const isActive = currentStreamQueue === pl.streamTracks;
+      let html = `<div class="sec-title">${esc(pl.icon)} ${esc(pl.name)} <small>${pl.streamTracks.length} songs</small>
+    <button onclick="playStreamPlaylist('${pl.id}')" style="background:var(--accent);color:#000;border:none;padding:5px 16px;border-radius:20px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;margin-left:12px">
+      <i class="ti ti-player-play"></i> Play All
+    </button>
+  </div>
+  <div class="track-hdr"><span style="width:36px"></span><span>Title</span><span>Artist</span><span></span></div>`;
+      pl.streamTracks.forEach((s, i) => {
+        const isP = currentStream && (currentStream.id === s.id || (currentStream.title === s.title && currentStream.artist === s.artist));
+        html += `<div class="track-row${isP ? ' playing' : ''}" onclick="playStreamPlaylist('${pl.id}',${i})">
+      <div>${s.img ? `<img class="t-art-img" src="${esc(s.img)}" onerror="this.outerHTML='<div class=t-art-emoji>🎵</div>'">` : '<div class="t-art-emoji">🎵</div>'}</div>
+      <div class="t-info"><div class="t-name">${esc(s.title)}</div><div class="t-artist">${esc(s.artist)}</div></div>
+      <div class="t-col">${esc(s.artist)}</div>
+      <div class="t-acts" onclick="event.stopPropagation()">
+        <button onclick="toggleLikeStream(${JSON.stringify(s).replace(/"/g, '&quot;')})" title="Like"><i class="ti ti-heart${isStreamLiked(s.id) ? '-filled' : ''}"></i></button>
+        <button onclick="downloadStream(${JSON.stringify(s).replace(/"/g, '&quot;')})" title="Save to My Songs"><i class="ti ti-download"></i></button>
+      </div>
+    </div>`;
+      });
+      c.innerHTML = html;
+    }
+
+    function playStreamPlaylist(plId, startIdx = 0) {
+      const pl = playlists.find(p => p.id === plId);
+      if (!pl?.streamTracks?.length) return;
+      currentStreamQueue = pl.streamTracks;
+      currentStreamIdx = startIdx;
+      playStreamSong(pl.streamTracks[startIdx], true);
+      // Re-render to show playing state
+      setTimeout(() => renderStreamPlaylist(pl), 200);
+    }
+
+    function renderMerge() {
+      const allPls = playlists.filter(p => (p.tracks && p.tracks.length > 0) || (p.streamTracks && p.streamTracks.length > 0));
+      const c = document.getElementById('content');
+
+      if (allPls.length < 2) {
+        c.innerHTML = `<div class="empty"><i class="ti ti-git-merge"></i><p>You need at least 2 playlists to merge.<br><small>Import or create playlists first.</small></p></div>`;
+        return;
+      }
+
+      c.innerHTML = `
+    <div class="import-box">
+      <h3><i class="ti ti-git-merge"></i> Merge Playlists</h3>
+      <p style="color:var(--t2);font-size:12px;margin-bottom:16px;line-height:1.7">
+        Select two or more playlists to combine into one new playlist. Duplicate songs are removed automatically.
+      </p>
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">Select playlists to merge:</label>
+        <div id="pl-checklist" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto">
+          ${allPls.map(p => {
+        const count = p.streamTracks ? p.streamTracks.length : p.tracks.length;
+        return `<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer" onmouseover="this.style.background='var(--bg4)'" onmouseout="this.style.background='none'">
+              <input type="checkbox" value="${esc(p.id)}" style="accent-color:var(--accent);width:16px;height:16px;cursor:pointer">
+              <span style="font-size:13px;color:var(--t1)">${esc(p.icon)} ${esc(p.name)}</span>
+              <span style="font-size:11px;color:var(--t3);margin-left:auto">${count} songs</span>
+            </label>`;
+      }).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">New playlist name:</label>
+        <input id="merge-name" type="text" placeholder="My Merged Playlist"
+          style="width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:9px 13px;color:var(--t1);font-size:13px;font-family:inherit;outline:none"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--bdr)'">
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="doMerge()" style="background:var(--accent);color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">
+          <i class="ti ti-git-merge"></i> Merge Playlists
+        </button>
+        <span style="font-size:11px;color:var(--t3)">Original playlists are kept unchanged</span>
+      </div>
+      <div id="merge-result" style="margin-top:14px"></div>
+    </div>`;
+    }
+
+    function doMerge() {
+      const checked = [...document.querySelectorAll('#pl-checklist input[type=checkbox]:checked')];
+      if (checked.length < 2) { toast('Select at least 2 playlists to merge'); return; }
+      const name = document.getElementById('merge-name').value.trim() || 'Merged Playlist';
+      const resultEl = document.getElementById('merge-result');
+      const seen = new Set();
+      const merged = [];
+
+      for (const cb of checked) {
+        const pl = playlists.find(p => p.id === cb.value);
+        if (!pl) continue;
+        if (pl.streamTracks && pl.streamTracks.length) {
+          for (const t of pl.streamTracks) {
+            const key = (t.title + '|' + t.artist).toLowerCase();
+            if (!seen.has(key)) { seen.add(key); merged.push(t); }
+          }
+        } else if (pl.tracks && pl.tracks.length) {
+          const songs = library.filter(s => pl.tracks.includes(s.id));
+          for (const s of songs) {
+            const key = (s.title + '|' + s.artist).toLowerCase();
+            if (!seen.has(key)) { seen.add(key); merged.push(s); }
+          }
+        }
+      }
+
+      if (!merged.length) { toast('No songs found in selected playlists'); return; }
+
+      const hasEncUrl = merged[0].encUrl !== undefined;
+      const newId = 'pl_' + (nextPId++);
+      if (hasEncUrl) {
+        playlists.push({ id: newId, name, icon: '🎵', tracks: [], streamTracks: merged });
+      } else {
+        playlists.push({ id: newId, name, icon: '🎵', tracks: merged.map(s => s.id) });
+      }
+
+      renderSidebar();
+      scheduleSave();
+
+      const totalInput = checked.reduce((sum, cb) => {
+        const pl = playlists.find(p => p.id === cb.value);
+        if (!pl) return sum;
+        return sum + (pl.streamTracks ? pl.streamTracks.length : pl.tracks.length);
+      }, 0);
+      const dupes = totalInput - merged.length;
+
+      resultEl.innerHTML = `
+    <div style="background:rgba(30,215,96,.1);border:1px solid var(--accent);border-radius:10px;padding:16px;text-align:center">
+      <p style="color:var(--accent);font-size:16px;font-weight:700;margin-bottom:4px">✅ "${esc(name)}" created!</p>
+      <p style="color:var(--t2);font-size:12px;margin-bottom:${dupes > 0 ? '4px' : '14px'}">${merged.length} songs merged from ${checked.length} playlists</p>
+      ${dupes > 0 ? `<p style="color:var(--t3);font-size:11px;margin-bottom:14px">${dupes} duplicate${dupes > 1 ? 's' : ''} removed</p>` : ''}
+      <button onclick="goPage('playlist','${newId}')" style="background:var(--accent);color:#000;border:none;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700">
+        <i class="ti ti-list"></i> View Playlist
+      </button>
+    </div>`;
+      toast('✓ "' + name + '" created with ' + merged.length + ' songs!');
+    }
+
+    function renderSettings() {
+      const c = document.getElementById('content');
+      const username = waveUser?.username || 'User';
+      const email = waveUser?.email || 'Not logged in';
+
+      c.innerHTML = `
+    <div class="settings-box">
+      <h3 style="margin-bottom:14px"><i class="ti ti-user-circle"></i> Account</h3>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">${esc(username)}</div>
+          <div class="settings-sub">${esc(email)}</div>
+        </div>
+        <button class="settings-btn danger" onclick="doLogout()"><i class="ti ti-logout"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3 style="margin-bottom:14px"><i class="ti ti-lifebuoy"></i> Support</h3>
+      <p style="color:var(--t2);font-size:13px;line-height:1.8;margin-bottom:12px">
+        Facing any problem in the WAVE app? Send us an email describing the issue — what happened, what page you were on, and any error messages you saw. We'll get back to you as soon as possible.
+      </p>
+      <div class="settings-row" style="border-bottom:none">
+        <div>
+          <div class="settings-label">Contact Support</div>
+          <div class="settings-sub">wavemusicappsupport@gmail.com</div>
+        </div>
+        <button class="settings-btn" onclick="copyEmail()"><i class="ti ti-copy"></i> Copy Email</button>
+      </div>
+    </div>
+
+    <div class="settings-box">
+      <h3 style="margin-bottom:14px"><i class="ti ti-info-circle"></i> About</h3>
+      <p style="color:var(--t2);font-size:13px;line-height:1.8">
+        <strong style="color:var(--t1)">WAVE</strong> — Your Music, Your Vibe.<br>
+        Stream millions of songs, import Spotify playlists, and create your perfect mix.
+      </p>
+    </div>`;
+    }
+
+    function copyEmail() {
+      const email = 'wavemusicappsupport@gmail.com';
+      navigator.clipboard.writeText(email).then(() => toast('✓ Email copied to clipboard!'));
+    }
+
+    function doLogout() {
+      if (!confirm('Are you sure you want to logout?')) return;
+      localStorage.removeItem('wave_token');
+      localStorage.removeItem('wave_user');
+      waveToken = null; waveUser = null;
+      if (waveWS) { try { waveWS.close(); } catch (e) { } waveWS = null; }
+      window.location.reload();
+    }
+
+    function renderSidebar() {
+      document.getElementById('pl-list').innerHTML = playlists.filter(p => p.id !== 'liked').map(p => `
+    <div class="pl-item${activePl === p.id ? ' active' : ''}" onclick="goPage('playlist','${p.id}')" oncontextmenu="showPlCtx(event,'${p.id}')">
+      <div class="pl-dot">${p.icon}</div>
+      <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}</span>
+    </div>`).join('');
+      const liked = playlists.find(p => p.id === 'liked'), badge = document.getElementById('liked-badge');
+      const total = liked.tracks.length + likedStreams.length;
+      badge.textContent = total; badge.style.display = total > 0 ? '' : 'none';
+    }
+
+    // ═══════════════ LOCAL PLAYBACK ═══════════════
+    function handleTrackClick(id) { if (curSongId() === id && curIdx >= 0) { togglePlay(); return } playLocal(id); }
+    function playLocal(id) {
+      audio.pause(); audio.src = ''; currentStream = null;
+      const idx = library.findIndex(t => t.id === id); if (idx < 0) return;
+      curIdx = idx; playing = false; resetProgress();
+      const t = library[idx];
+      setPlayerInfo(t.img, t.title, t.artist, 'local');
+      audio.src = t.url;
+      audio.play().then(() => { playing = true; document.getElementById('play-ico').className = 'ti ti-player-pause'; }).catch(() => { });
+      addToHistory({ title: t.title, artist: t.artist, img: t.img || '', emoji: t.emoji, source: 'local', id: t.id });
+      updateSessionContext(t);
+      render();
+    }
+    function setPlayerInfo(img, title, artist, type) {
+      document.getElementById('np-art').innerHTML = img ? `<img src="${esc(img)}" style="width:100%;height:100%;object-fit:cover" onerror="this.outerHTML='🎵'">` : '🎵';
+      document.getElementById('np-title').textContent = title;
+      document.getElementById('np-artist').textContent = artist;
+      updateLikeBtn();
+    }
+    function updateLikeBtn() {
+      let lk = false;
+      if (curIdx >= 0) lk = isLiked(library[curIdx]?.id);
+      else if (currentStream) lk = isStreamLiked(currentStream.id);
+      const btn = document.getElementById('np-like');
+      btn.className = 'np-like' + (lk ? ' liked' : '');
+      btn.innerHTML = `<i class="ti ti-heart${lk ? '-filled' : ''}"></i>`;
+    }
+    function togglePlay() {
+      if (curIdx < 0 && !currentStream) { const q2 = getQueue(); if (q2.length) playLocal(q2[0].id); return }
+      if (playing) { audio.pause(); playing = false; document.getElementById('play-ico').className = 'ti ti-player-play'; }
+      else { audio.play().then(() => { playing = true; document.getElementById('play-ico').className = 'ti ti-player-pause'; }).catch(() => { }) }
+    }
+    function getQueue() { const v = getVisible(); return v.length > 0 ? v : library }
+    function getSmartNext(q2) {
+      if (!shuffleQ.length || sessionContext.lastPlayed) {
+        const cur = sessionContext.lastPlayed || q2[0];
+        const nextIdx = getSmartShuffleNext(q2, cur);
+        return nextIdx !== -1 ? q2[nextIdx].id : q2[Math.floor(Math.random() * q2.length)].id;
+      }
+      return q2[Math.floor(Math.random() * q2.length)].id;
+    }
+    async function nextTrack() {
+      // If playing from stream queue, navigate within it
+      if (currentStream) {
+        if (currentStreamQueue.length && currentStreamIdx >= 0) {
+          const nextIdx = shuffle
+            ? getSmartShuffleNext(currentStreamQueue, currentStream)
+            : (currentStreamIdx + 1) % currentStreamQueue.length;
+          currentStreamIdx = nextIdx !== -1 ? nextIdx : 0;
+          playStreamSong(currentStreamQueue[currentStreamIdx], true);
+          return;
+        }
+        try {
+          toast('Finding next song...');
+          const similar = await getSimilarSongs(currentStream.artist, currentStream.title);
+          if (similar.length) {
+            const nextIdx = getSmartShuffleNext(similar, currentStream);
+            const next = similar[nextIdx !== -1 ? nextIdx : 0];
+            await playStreamSong(next);
+          } else {
+            toast('No similar songs found');
+          }
+        } catch (e) { toast('Error finding next song'); }
+        return;
+      }
+      const q2 = getQueue(); if (!q2.length) return;
+      if (shuffle) { const nid = getSmartNext(q2); if (nid) playLocal(nid); }
+      else { const i = q2.findIndex(t => t.id === curSongId()); playLocal(q2[(i + 1) % q2.length].id) }
+    }
+    function prevTrack() {
+      if (audio.currentTime > 3) { audio.currentTime = 0; return }
+      // If playing from stream queue, go back within it
+      if (currentStream && currentStreamQueue.length && currentStreamIdx >= 0) {
+        const prevIdx = (currentStreamIdx - 1 + currentStreamQueue.length) % currentStreamQueue.length;
+        currentStreamIdx = prevIdx;
+        playStreamSong(currentStreamQueue[prevIdx], true);
+        return;
+      }
+      const q2 = getQueue(); if (!q2.length) return;
+      const i = q2.findIndex(t => t.id === curSongId());
+      playLocal(q2[(i - 1 + q2.length) % q2.length].id);
+    }
+    function toggleShuffle() { shuffle = !shuffle; shuffleQ = []; document.getElementById('btn-shuffle').classList.toggle('active', shuffle); scheduleSave() }
+    function toggleRepeat() { repeat = !repeat; document.getElementById('btn-repeat').classList.toggle('active', repeat); scheduleSave() }
+    audio.addEventListener('timeupdate', () => {
+      if (!playing) return;
+      const dur = audio.duration || 0, cur = audio.currentTime || 0, p = dur ? (cur / dur) * 100 : 0;
+      document.getElementById('prog-fill').style.width = p + '%';
+      document.getElementById('prog-thumb').style.left = p + '%';
+      document.getElementById('t-cur').textContent = ft(cur);
+      document.getElementById('t-dur').textContent = ft(dur);
+    });
+    function resetProgress() { document.getElementById('prog-fill').style.width = '0%'; document.getElementById('prog-thumb').style.left = '0%'; document.getElementById('t-cur').textContent = '0:00'; document.getElementById('t-dur').textContent = '0:00'; document.getElementById('play-ico').className = 'ti ti-player-play'; }
+    function seekTo(e) { const bar = document.getElementById('prog-bar'); if (audio.duration) audio.currentTime = (e.offsetX / bar.offsetWidth) * audio.duration }
+    function setVol(e) { vol = Math.max(0, Math.min(1, e.offsetX / e.currentTarget.offsetWidth)); audio.volume = vol; document.getElementById('vol-fill').style.width = (vol * 100) + '%'; scheduleSave() }
+    function toggleMute() { muted = !muted; audio.muted = muted; document.getElementById('vol-ico').className = 'ti ti-volume' + (muted ? '-off' : '') }
+
+    // ═══════════════ LIKES LOCAL ═══════════════
+    function toggleLike(id) { const lk = playlists.find(p => p.id === 'liked'), i = lk.tracks.indexOf(id); if (i < 0) { lk.tracks.push(id); toast('❤️ Liked!'); } else { lk.tracks.splice(i, 1); toast('Removed from liked'); } render(); renderSidebar(); updateLikeBtn(); scheduleSave() }
+
+    // ═══════════════ PLAYLISTS ═══════════════
+    function openCreatePl() { document.getElementById('modal-pl').classList.add('open'); document.getElementById('pl-name-in').focus() }
+    function closeModals() { document.querySelectorAll('.overlay').forEach(m => m.classList.remove('open')) }
+    document.getElementById('pl-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') doCreatePl(); if (e.key === 'Escape') closeModals() });
+    function doCreatePl() { const name = document.getElementById('pl-name-in').value.trim(); if (!name) return; const id = 'pl_' + (nextPId++); playlists.push({ id, name, icon: EMOJIS[Math.floor(Math.random() * EMOJIS.length)], tracks: [] }); document.getElementById('pl-name-in').value = ''; closeModals(); renderSidebar(); goPage('playlist', id); scheduleSave('Playlist created') }
+    function showCtx(e, id) { e.preventDefault(); e.stopPropagation(); ctxId = id; const m = document.getElementById('ctx-menu'); m.classList.add('open'); m.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px'; m.style.top = Math.min(e.clientY, window.innerHeight - 160) + 'px'; const lk = isLiked(id); document.getElementById('ctx-like-item').innerHTML = `<i class="ti ti-heart${lk ? '-filled' : ''}"></i> ${lk ? 'Unlike' : 'Like'}` }
+    // ═══════════════ PLAYLIST CONTEXT MENU ═══════════════
+    let activePlCtx = null;
+    function showPlCtx(e, plId) {
+      e.preventDefault(); e.stopPropagation();
+      activePlCtx = plId;
+      const m = document.getElementById('pl-ctx-menu');
+      m.classList.add('open');
+      m.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+      m.style.top = Math.min(e.clientY, window.innerHeight - 100) + 'px';
+    }
+    function renamePl() {
+      document.getElementById('pl-ctx-menu').classList.remove('open');
+      const pl = playlists.find(p => p.id === activePlCtx);
+      if (!pl) return;
+      const name = prompt('Rename playlist:', pl.name);
+      if (name && name.trim()) { pl.name = name.trim(); renderSidebar(); scheduleSave('Playlist renamed'); }
+    }
+    function deletePl() {
+      document.getElementById('pl-ctx-menu').classList.remove('open');
+      const pl = playlists.find(p => p.id === activePlCtx);
+      if (!pl) return;
+      if (!confirm('Delete playlist "' + pl.name + '"? Songs will not be deleted.')) return;
+      playlists = playlists.filter(p => p.id !== activePlCtx);
+      if (activePl === activePlCtx) goPage('library');
+      renderSidebar(); scheduleSave('Playlist deleted'); toast('Playlist deleted');
+    }
+    document.addEventListener('click', () => {
+      document.getElementById('ctx-menu').classList.remove('open');
+      document.getElementById('pl-ctx-menu').classList.remove('open');
+    });
+    function ctxLike() { if (ctxId) toggleLike(ctxId); document.getElementById('ctx-menu').classList.remove('open') }
+    async function ctxDelete() { if (!ctxId) return; library = library.filter(t => t.id !== ctxId); playlists.forEach(p => { p.tracks = p.tracks.filter(id => id !== ctxId) }); if (library[curIdx]?.id === ctxId) { curIdx = -1; playing = false; audio.pause(); audio.src = ''; resetProgress(); document.getElementById('np-title').textContent = 'Nothing playing'; document.getElementById('np-artist').textContent = '—'; document.getElementById('np-art').innerHTML = '🎵' } document.getElementById('ctx-menu').classList.remove('open'); await dbDel('songs', ctxId); await saveMeta(); render(); renderSidebar(); toast('Song removed') }
+    function ctxAddTo() { document.getElementById('ctx-menu').classList.remove('open'); const pls = playlists.filter(p => p.id !== 'liked'), el = document.getElementById('addto-items'); el.innerHTML = !pls.length ? '<p style="color:var(--t3);font-size:13px;padding:8px">Create a playlist first!</p>' : pls.map(p => { const has = p.tracks.includes(ctxId); return `<div class="ctx-item" onclick="addTo('${p.id}',this)"><i class="ti ti-${has ? 'check' : 'plus'}"></i> ${esc(p.name)}${has ? ' <small style="color:var(--t3)">(added)</small>' : ''}</div>` }).join(''); document.getElementById('modal-addto').classList.add('open') }
+    function addTo(pid, el) { const pl = playlists.find(p => p.id === pid); if (!pl || !ctxId) return; if (!pl.tracks.includes(ctxId)) pl.tracks.push(ctxId); el.innerHTML = `<i class="ti ti-check"></i> ${esc(pl.name)} <small style="color:var(--t3)">(added)</small>`; renderSidebar(); scheduleSave('Added to playlist') }
+    document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeModals() }));
+
+    // TOAST
+    function toast(msg) { document.getElementById('toast-msg').textContent = msg; const t = document.getElementById('toast'); t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2500) }
+
+    // KEYBOARD
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.code === 'Space') { e.preventDefault(); togglePlay() }
+      if (e.code === 'ArrowRight' && audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+      if (e.code === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 5);
+      if (e.code === 'KeyN') nextTrack(); if (e.code === 'KeyS') toggleShuffle(); if (e.code === 'KeyR') toggleRepeat();
+    });
+
+    // ═══════════════ BOOT ═══════════════
+    (async () => {
+      try { document.getElementById('load-txt').textContent = 'Opening database...'; await openDB(); document.getElementById('load-txt').textContent = 'Loading your library...'; await loadDB(); }
+      catch (err) { console.warn(err); if (!playlists.find(p => p.id === 'liked')) playlists = [{ id: 'liked', name: 'Liked Songs', icon: '❤️', tracks: [] }]; }
+      audio.volume = vol;
+      document.getElementById('btn-shuffle').classList.toggle('active', shuffle);
+      document.getElementById('btn-repeat').classList.toggle('active', repeat);
+      document.getElementById('tab-list').classList.toggle('active', tabView === 'list');
+      document.getElementById('tab-grid').classList.toggle('active', tabView === 'grid');
+      document.getElementById('vol-fill').style.width = (vol * 100) + '%';
+      render(); renderSidebar();
+      setTimeout(() => document.getElementById('loading').classList.add('hide'), 400);
+    })();
+
+    // ═══════════════ AUTH SYSTEM ═══════════════
+    const WAVE_SERVER = 'https://wave-server-ezxc.onrender.com';
+    let waveToken = localStorage.getItem('wave_token') || null;
+    // waveUser moved to top
+    let waveWS = null;
+
+    function switchAuthTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-pass').value;
+      const errEl = document.getElementById('login-err');
+      const btn = document.getElementById('login-btn');
+      if (!email || !pass) { errEl.textContent = 'Please fill all fields'; return; }
+      btn.textContent = 'Logging in...'; btn.disabled = true;
+      try {
+        const r = await fetch(WAVE_SERVER + '/api/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pass })
+        });
+        const d = await r.json();
+        if (d.error === 'BLOCKED') { showBlocked(d.blockReason); btn.textContent = 'Login'; btn.disabled = false; return; }
+        if (d.error) { errEl.textContent = d.error; btn.textContent = 'Login'; btn.disabled = false; return; }
+        waveToken = d.token; waveUser = d.user;
+        localStorage.setItem('wave_token', d.token);
+        localStorage.setItem('wave_user', JSON.stringify(d.user));
+        btn.textContent = 'Login'; btn.disabled = false;
+        window.location.reload();
+      } catch (e) {
+        errEl.textContent = 'Cannot connect to server. Make sure WAVE server is running.';
+        btn.textContent = 'Login'; btn.disabled = false;
+      }
+    }
+
+    async function doSignup() {
+      const email = document.getElementById('signup-email').value.trim();
+      const username = document.getElementById('signup-user').value.trim();
+      const pass = document.getElementById('signup-pass').value;
+      const errEl = document.getElementById('signup-err');
+      const btn = document.getElementById('signup-btn');
+      if (!email || !username || !pass) { errEl.textContent = 'Please fill all fields'; return; }
+      btn.textContent = 'Creating...'; btn.disabled = true;
+      try {
+        const r = await fetch(WAVE_SERVER + '/api/signup', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, username, password: pass })
+        });
+        const d = await r.json();
+        if (d.error) { errEl.textContent = d.error; btn.textContent = 'Create Account'; btn.disabled = false; return; }
+        waveToken = d.token; waveUser = d.user;
+        localStorage.setItem('wave_token', d.token);
+        localStorage.setItem('wave_user', JSON.stringify(d.user));
+        btn.textContent = 'Create Account'; btn.disabled = false;
+        window.location.reload();
+      } catch (e) {
+        errEl.textContent = 'Cannot connect to server.';
+        btn.textContent = 'Create Account'; btn.disabled = false;
+      }
+    }
+
+    function authSuccess() {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('blocked-screen').style.display = 'none';
+      connectAuthWS();
+
+      const hasSeenWelcome = sessionStorage.getItem('wave_welcome');
+      if (!hasSeenWelcome && waveUser) {
+        sessionStorage.setItem('wave_welcome', 'true');
+        const uname = waveUser.username || waveUser.email.split('@')[0];
+        const notif = document.createElement('div');
+        notif.style = "position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid var(--accent);padding:15px;border-radius:10px;z-index:9999;max-width:350px;box-shadow:0 10px 30px rgba(0,0,0,0.5);";
+        notif.innerHTML = `
+          <h4 style="color:var(--accent);margin-bottom:8px;font-size:14px;"><i class="ti ti-bell"></i> Hello ${esc(uname)}!</h4>
+          <p style="font-size:12px;color:var(--t2);line-height:1.4;">
+            We are happy to see you are using our app! There is a Spotify import button and the limit is only 100 tracks. 
+            So if your playlist is more than 100 songs, make it into two parts and then you can merge the playlist from the Merge Playlists option.
+          </p>
+          <button onclick="this.parentElement.remove()" style="margin-top:10px;background:var(--accent);color:#000;border:none;padding:5px 15px;border-radius:15px;font-size:11px;font-weight:bold;cursor:pointer;">Got it</button>
+        `;
+        document.body.appendChild(notif);
+      }
+    }
+
+    function showBlocked(reason) {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('blocked-screen').style.display = 'flex';
+      document.getElementById('block-reason-text').textContent = reason || 'Policy violation';
+      localStorage.removeItem('wave_token');
+      localStorage.removeItem('wave_user');
+      waveToken = null;
+    }
+
+    function connectAuthWS() {
+      if (!waveToken) return;
+      const deviceInfo = navigator.platform + ' / Chrome';
+      try {
+        waveWS = new WebSocket('wss://wave-server-ezxc.onrender.com');
+        waveWS.onopen = () => waveWS.send(JSON.stringify({ type: 'auth', token: waveToken, deviceInfo }));
+        waveWS.onmessage = (e) => {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'blocked') showBlocked(msg.reason);
+          } catch (e) { }
+        };
+        waveWS.onclose = () => setTimeout(() => { if (waveToken) connectAuthWS(); }, 5000);
+        setInterval(() => { if (waveWS && waveWS.readyState === 1) waveWS.send(JSON.stringify({ type: 'ping' })); }, 30000);
+      } catch (e) { }
+    }
+
+    // Auto-login: check saved token on startup, remember user across restarts
+    async function checkSavedToken() {
+      if (!waveToken) { return; } // show login screen
+      // Restore cached user immediately for instant UI (offline-friendly)
+      try {
+        const cachedUser = localStorage.getItem('wave_user');
+        if (cachedUser) waveUser = JSON.parse(cachedUser);
+      } catch (e) { }
+
+      try {
+        const r = await fetch(WAVE_SERVER + '/api/check', { headers: { Authorization: 'Bearer ' + waveToken } });
+        const d = await r.json();
+        if (d.error === 'BLOCKED') { showBlocked(d.blockReason); return; }
+        if (d.valid) {
+          waveUser = d.user;
+          localStorage.setItem('wave_user', JSON.stringify(d.user));
+          authSuccess(); return;
+        }
+        // Token invalid/expired - require login again
+        localStorage.removeItem('wave_token'); localStorage.removeItem('wave_user'); waveToken = null;
+      } catch (e) {
+        // Server unreachable - allow offline access with cached session
+        authSuccess(); return;
+      }
+    }
+    checkSavedToken();
+
+  </script>
+</body>
+
+</html>
