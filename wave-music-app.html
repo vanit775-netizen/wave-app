@@ -2279,33 +2279,9 @@
     }
 
     // ═══════════════ JIOSAAVN API ═══════════════
-    const isElectronApp = typeof window !== 'undefined' && typeof window.require === 'function';
-    const isCapacitor = typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-
-    async function universalFetch(url, options = {}) {
-      if (isElectronApp || isCapacitor) {
-        return fetch(url, options);
-      }
-      
-      // Always try our own internal proxy server first (works on localhost AND Render web services)
-      if (window.location.protocol.startsWith('http')) {
-        try {
-          const internalRes = await fetch('/proxy?url=' + encodeURIComponent(url), options);
-          // If the internal proxy exists and succeeds, return it
-          if (internalRes.ok) return internalRes;
-        } catch (e) {
-          // If it fails (e.g., hosted on GitHub pages without a backend), continue to fallback
-        }
-      }
-      
-      // Fallback public proxy if no internal server is found
-      // Note: CodeTabs doesn't want the full URL encodeURIComponent'd
-      return fetch('https://api.codetabs.com/v1/proxy?quest=' + url, options);
-    }
-
     async function searchJioSaavn(query, limit = 20) {
       const url = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=${limit}&p=1&q=${encodeURIComponent(query)}`;
-      const res = await universalFetch(url);
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Search failed');
       const data = JSON.parse(await res.text());
       const results = (data?.results || []).map(s => {
@@ -2326,7 +2302,7 @@
 
     async function getPlayUrl(encUrl) {
       const url = `https://www.jiosaavn.com/api.php?__call=song.generateAuthToken&_format=json&_marker=0&api_version=4&ctx=web6dot0&bitrate=320&url=${encodeURIComponent(fixUrl(encUrl))}`;
-      const res = await universalFetch(url);
+      const res = await fetch(url);
       if (!res.ok) throw new Error('Auth failed');
       const text = await res.text();
       const j = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
@@ -2486,8 +2462,8 @@
       try {
         // Fetch multiple pages to get more results
         const [page1, page2] = await Promise.all([
-          universalFetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=1&q=${encodeURIComponent(q2)}`).then(r => r.json()),
-          universalFetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=2&q=${encodeURIComponent(q2)}`).then(r => r.json()).catch(() => ({ results: [] }))
+          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=1&q=${encodeURIComponent(q2)}`).then(r => r.json()),
+          fetch(`https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=20&p=2&q=${encodeURIComponent(q2)}`).then(r => r.json()).catch(() => ({ results: [] }))
         ]);
         const allRaw = [...(page1?.results || []), ...(page2?.results || [])];
         if (!allRaw.length) throw new Error('No songs found');
@@ -2631,7 +2607,7 @@
         const encUrl = s.encUrl || (await searchJioSaavn(s.title + ' ' + s.artist, 1))[0]?.encUrl;
         if (!encUrl) throw new Error('No URL');
         const playUrl = await getPlayUrl(encUrl);
-        const res = await universalFetch(playUrl);
+        const res = await fetch(playUrl);
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const song = { id: uid(), title: s.title, artist: s.artist, url, emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)], img: s.img || '', duration: s.duration || 0 };
@@ -2681,16 +2657,10 @@
     // ── Ask main process to fetch URL (bypasses ALL CORS/cookie restrictions) ──
     async function mainFetch(url, headers = {}) {
       try {
-        if (isElectronApp) {
-          const { ipcRenderer } = window.require('electron');
-          const res = await ipcRenderer.invoke('fetch-url', { url, headers });
-          if (res.error) throw new Error(res.error);
-          return res.text;
-        } else {
-          // Browser fallback using proxy
-          const res = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(url));
-          return await res.text();
-        }
+        const { ipcRenderer } = window.require('electron');
+        const res = await ipcRenderer.invoke('fetch-url', { url, headers });
+        if (res.error) throw new Error(res.error);
+        return res.text;
       } catch (e) { throw e; }
     }
 
@@ -2762,19 +2732,12 @@
       if (!match) { toast('Invalid URL — paste a full Spotify playlist link'); return; }
       const plId = match[1];
       const result = document.getElementById('import-result');
-      let ipcRenderer = null;
-      if (isElectronApp) {
-        ipcRenderer = window.require('electron').ipcRenderer;
-      }
+      const { ipcRenderer } = window.require('electron');
       function dbg(msg) { console.log('[WAVE Import]', msg); }
       // Check token and update connection status
       try {
-        if (ipcRenderer) {
-          const tok = await ipcRenderer.invoke('get-spotify-token');
-          window._spotifyConnected = !!tok;
-        } else {
-          window._spotifyConnected = false;
-        }
+        const tok = await ipcRenderer.invoke('get-spotify-token');
+        window._spotifyConnected = !!tok;
       } catch (e) { }
 
       if (!window._spotifyConnected) {

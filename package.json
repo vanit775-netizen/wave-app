@@ -6,7 +6,6 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "start:web": "node web-server.js",
     "build": "electron-builder --win --x64",
     "dist": "electron-builder",
     "build-mobile": "node build-mobile.js",
