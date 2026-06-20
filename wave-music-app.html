@@ -2279,9 +2279,26 @@
     }
 
     // ═══════════════ JIOSAAVN API ═══════════════
+    const isElectronApp = typeof window !== 'undefined' && typeof window.require === 'function';
+    const isCapacitor = typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+
+    async function universalFetch(url, options = {}) {
+      if (isElectronApp || isCapacitor) {
+        return fetch(url, options);
+      }
+      
+      // If served via the local proxy server (node web-server.js)
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return fetch('/proxy?url=' + encodeURIComponent(url), options);
+      }
+      
+      // Fallback proxy for file:/// or remote hosting
+      return fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url), options);
+    }
+
     async function searchJioSaavn(query, limit = 20) {
       const url = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&api_version=4&ctx=web6dot0&n=${limit}&p=1&q=${encodeURIComponent(query)}`;
-      const res = await fetch(url);
+      const res = await universalFetch(url);
       if (!res.ok) throw new Error('Search failed');
       const data = JSON.parse(await res.text());
       const results = (data?.results || []).map(s => {
@@ -2302,7 +2319,7 @@
 
     async function getPlayUrl(encUrl) {
       const url = `https://www.jiosaavn.com/api.php?__call=song.generateAuthToken&_format=json&_marker=0&api_version=4&ctx=web6dot0&bitrate=320&url=${encodeURIComponent(fixUrl(encUrl))}`;
-      const res = await fetch(url);
+      const res = await universalFetch(url);
       if (!res.ok) throw new Error('Auth failed');
       const text = await res.text();
       const j = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
@@ -2607,7 +2624,7 @@
         const encUrl = s.encUrl || (await searchJioSaavn(s.title + ' ' + s.artist, 1))[0]?.encUrl;
         if (!encUrl) throw new Error('No URL');
         const playUrl = await getPlayUrl(encUrl);
-        const res = await fetch(playUrl);
+        const res = await universalFetch(playUrl);
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const song = { id: uid(), title: s.title, artist: s.artist, url, emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)], img: s.img || '', duration: s.duration || 0 };
@@ -2657,10 +2674,16 @@
     // ── Ask main process to fetch URL (bypasses ALL CORS/cookie restrictions) ──
     async function mainFetch(url, headers = {}) {
       try {
-        const { ipcRenderer } = window.require('electron');
-        const res = await ipcRenderer.invoke('fetch-url', { url, headers });
-        if (res.error) throw new Error(res.error);
-        return res.text;
+        if (isElectronApp) {
+          const { ipcRenderer } = window.require('electron');
+          const res = await ipcRenderer.invoke('fetch-url', { url, headers });
+          if (res.error) throw new Error(res.error);
+          return res.text;
+        } else {
+          // Browser fallback using proxy
+          const res = await fetch('https://corsproxy.io/?url=' + encodeURIComponent(url));
+          return await res.text();
+        }
       } catch (e) { throw e; }
     }
 
@@ -2732,12 +2755,19 @@
       if (!match) { toast('Invalid URL — paste a full Spotify playlist link'); return; }
       const plId = match[1];
       const result = document.getElementById('import-result');
-      const { ipcRenderer } = window.require('electron');
+      let ipcRenderer = null;
+      if (isElectronApp) {
+        ipcRenderer = window.require('electron').ipcRenderer;
+      }
       function dbg(msg) { console.log('[WAVE Import]', msg); }
       // Check token and update connection status
       try {
-        const tok = await ipcRenderer.invoke('get-spotify-token');
-        window._spotifyConnected = !!tok;
+        if (ipcRenderer) {
+          const tok = await ipcRenderer.invoke('get-spotify-token');
+          window._spotifyConnected = !!tok;
+        } else {
+          window._spotifyConnected = false;
+        }
       } catch (e) { }
 
       if (!window._spotifyConnected) {
