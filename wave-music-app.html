@@ -2287,13 +2287,20 @@
         return fetch(url, options);
       }
       
-      // If served via the local proxy server (node web-server.js)
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return fetch('/proxy?url=' + encodeURIComponent(url), options);
+      // Always try our own internal proxy server first (works on localhost AND Render web services)
+      if (window.location.protocol.startsWith('http')) {
+        try {
+          const internalRes = await fetch('/proxy?url=' + encodeURIComponent(url), options);
+          // If the internal proxy exists and succeeds, return it
+          if (internalRes.ok) return internalRes;
+        } catch (e) {
+          // If it fails (e.g., hosted on GitHub pages without a backend), continue to fallback
+        }
       }
       
-      // Fallback proxy for remote static hosting (Render/GitHub Pages)
-      return fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url), options);
+      // Fallback public proxy if no internal server is found
+      // Note: CodeTabs doesn't want the full URL encodeURIComponent'd
+      return fetch('https://api.codetabs.com/v1/proxy?quest=' + url, options);
     }
 
     async function searchJioSaavn(query, limit = 20) {
